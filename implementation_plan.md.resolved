@@ -1,0 +1,109 @@
+# MAPN Implementation Plan
+
+This document outlines the step-by-step implementation strategy for the **Multi-Agent Portfolio Negotiator (MAPN)**. The goal is to build a robust, demonstrable negotiation system between four specialized AI agents (Risk, Growth, Compliance, Liquidity) supervised by a central logic, deployable within 48 hours.
+
+## User Review Required
+> [!IMPORTANT]
+> **API Access**: Ensure valid keys for **Google Gemini** (Vertex AI or AI Studio) and **NVIDIA Nemotron** (via OpenRouter or NVIDIA NIM) are available.
+> **Database**: We will use Supabase. A new project credential set will be required.
+
+## Proposed Changes
+
+### Stage 1: Project Initialization & Infrastructure
+Set up the foundational tech stack.
+- [ ] **Initialize Next.js 15 Project**:
+    - `npx create-next-app@latest mapn --typescript --tailwind --eslint`
+    - Install `shadcn/ui` components (button, card, dialog, scroll-area, accordion, badge, avatar).
+- [ ] **Environment Configuration**:
+    - Create `.env.local` for:
+        - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+        - `SUPABASE_SERVICE_ROLE_KEY` (for interactions requiring elevated privs if any)
+        - `GEMINI_API_KEY`
+        - `OPENROUTER_API_KEY` (for Nemotron)
+- [ ] **Data Access Setup**:
+    - Install `@supabase/supabase-js`.
+    - Create `lib/supabase.ts` client helper.
+
+### Stage 2: Database Layer (Supabase)
+Define the schema and populate mock data.
+- [ ] **Schema Definition**:
+    - Enable `uuid-ossp` extension.
+    - Create `mock_assets` table: `symbol (PK), name, volatility, expected_return, esg_score, liquidity_score, sector`.
+    - Create `negotiations` table: `id (PK), input_params (JSONB), rounds_log (JSONB[]), final_allocation (JSONB), explanation (TEXT), created_at`.
+- [ ] **Seed Data**:
+    - Write a seeding script `scripts/seed-assets.ts`.
+    - Populate with ~20 diverse assets (e.g., Tech stocks, Bonds, Green Energy, volatile Crypto mockups) to allow agents to have meaningful conflicts.
+- [ ] **Type Generation**:
+    - Generate TypeScript types from Supabase schema for end-to-end type safety.
+
+### Stage 3: Agent Core Logic
+Implement the "Brain" of the application.
+- [ ] **LLM Client Adapters**:
+    - `lib/llm/gemini.ts`: Client for Gemini 2.0 Flash (Supervisor/Planning).
+    - `lib/llm/nemotron.ts`: Client for Nemotron 3 Nano (Reasoning/Scoring).
+    - Implement a `generateCompletion` interface to handle fallbacks/retries.
+- [ ] **Prompt Engineering**:
+    - Create prompt templates for each agent in `lib/agents/prompts/`.
+    - **Risk Agent**: "Critique this portfolio based on max volatility..."
+    - **Growth Agent**: "Propose changes to maximize alpha..."
+    - **Compliance Agent**: "Check strict rules (ESG > 80)..."
+    - **Liquidity Agent**: "Evaluate turnover and spread..."
+- [ ] **Agent Class Structure**:
+    - Create `Agent` abstract class.
+    - Implement `RiskAgent`, `GrowthAgent`, `ComplianceAgent`, `LiquidityAgent`.
+    - Each agent should have an `evaluate(currentPortfolio, constraints)` method returning structured JSON.
+
+### Stage 4: Negotiation Engine (Backend)
+Orchestrate the multi-agent interaction.
+- [ ] **API Endpoint**:
+    - Create `app/api/negotiate/route.ts`.
+    - Use `Edge Runtime` if possible for speed, or `Node.js` if library constraints exist.
+- [ ] **Negotiation Loop Logic**:
+    - **Initialization**: Fetch mock assets. Generate initial random or equal-weight portfolio.
+    - **Round 1-3 Loop**:
+        1. **Broadcast**: Send current state to all agents parallelly.
+        2. **Gather**: Collect bids/critiques.
+        3. **Supervisor**: Gemini aggregates bids into a new proposed allocation. Checks for consensus.
+        4. **Log**: Store round data.
+    - **Termination**: If `rounds >= 3` or `consensus == true`.
+- [ ] **Persistence**:
+    - Save the full transaction trace to `negotiations` table in Supabase.
+- [ ] **Streaming Response**:
+    - Implement `ReadableStream` response to stream round updates to the UI in real-time (optional but recommended for "Live" feel).
+
+### Stage 5: Frontend Implementation
+Build the user-facing application.
+- [ ] **Components**:
+    - `AgentCard`: Visual representation of each agent with dynamic status (Thinking, Bidding, Vetoing).
+    - `PortfolioChart`: Recharts/Chart.js pie/bar chart for allocations.
+    - `NegotiationFeed`: A chat-like interface showing agent reasoning logs.
+- [ ] **Pages**:
+    - **Home (`/`)**: Hero section + Input Form (Capital, Risk Tolerance, ESG Mandate).
+    - **Negotiation (`/negotiate/[id]`)**:
+        - Left Panel: Live inputs & constraints.
+        - Center Panel: Interactive negotiation feed.
+        - Right Panel: Real-time updated allocation chart.
+    - **History (`/history`)**: List of past negotiations.
+- [ ] **Integration**:
+    - Hook up the input form to `POST /api/negotiate`.
+    - Handle streaming data or implement polling to update the UI round-by-round.
+
+### Stage 6: Verification & Polish
+- [ ] **Testing**:
+    - Unit test agent prompt outputs (ensure valid JSON).
+    - Integration test the full API flow.
+- [ ] **Refinement**:
+    - Tweaks prompts for "personality" (e.g., Risk agent being pessimistic, Growth agent being aggressive).
+    - Add loading skeletons and error states.
+    - styling improvements (glassmorphism, neon accents for "Cyberpunk/Fintech" vibe).
+
+## Verification Plan
+
+### Automated Tests
+- Run `npm run lint` and `npm run build` to ensure type safety.
+- Write a script `scripts/test-negotiation.ts` that runs a simulation without the UI and logs the output efficiency.
+
+### Manual Verification
+- **Scenario A**: Low Risk, High ESG. Verify Compliance agent filters out non-ESG assets and Risk agent dominates allocation.
+- **Scenario B**: High Growth, Low Restrictions. Verify Growth agent allocates to volatile assets.
+- **Scenario C**: 429 Rate Limit. Verify system falls back to Gemini-only mode or graceful error message.
