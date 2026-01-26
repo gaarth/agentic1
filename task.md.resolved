@@ -1,0 +1,33 @@
+# Multi-Agent Portfolio Negotiator (MAPN) - Task List
+
+- [ ] **Phase 1: Project Initialization & Infrastructure**
+    - [ ] Initialize Next.js 15 App with Tailwind & Shadcn UI
+    - [ ] Configure Environment Variables & LLM API Clients
+    - [ ] Set up Supabase Client & Database Connection
+
+- [ ] **Phase 2: Database & Data Layer**
+    - [ ] Design and Apply Supabase SQL Schema (Negotiations, Assets)
+    - [ ] Seed Mock Asset Data
+    - [ ] Implement Type-Safe Data Access Layer
+
+- [ ] **Phase 3: AI Agents & Logic**
+    - [ ] Build LLM Adapter Layer (Gemini & Nemotron)
+    - [ ] Implement Base Agent Class
+    - [ ] Develop Individual Agents (Risk, Growth, Compliance, Liquidity)
+    - [ ] Develop Supervisor Agent & Aggregation Logic
+
+- [ ] **Phase 4: Negotiation Engine (Backend)**
+    - [ ] Implement Core Negotiation Loop (Multi-round)
+    - [ ] Build `/api/negotiate` Endpoint with Streaming/SSE
+    - [ ] Implement Result Persistence
+
+- [ ] **Phase 5: Frontend Experience**
+    - [ ] Build Portfolio Input Form
+    - [ ] Develop Live Negotiation Visualizer (Agent interactions)
+    - [ ] Create Results Dashboard & Explanation Views
+    - [ ] Build History/Session List
+
+- [ ] **Phase 6: Integration & Deployment**
+    - [ ] End-to-End Testing & Tuning
+    - [ ] Final UI Polish & Animations
+    - [ ] Deploy to Vercel
