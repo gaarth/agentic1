@@ -2,8 +2,7 @@
 
 import Link from "next/link"
 import { motion, useMotionValue, useTransform, useSpring } from "framer-motion"
-import { ShootingStars } from "@/components/effects/shooting-stars"
-import { CursorGradient } from "@/components/effects/cursor-gradient"
+import NeuralBackground from "@/components/ui/flow-field-background"
 import { useEffect, useRef, useState } from "react"
 
 const containerVariants = {
@@ -83,11 +82,15 @@ function MagneticButton({ href, children, className, variant = "primary" }: {
 export function HeroSection() {
     return (
         <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden px-6 pt-32 pb-20">
-            {/* Shooting Stars Background */}
-            <ShootingStars />
-
-            {/* Cursor Gradient Effect */}
-            <CursorGradient />
+            {/* Neural Flow Field Background */}
+            <div className="absolute inset-0 z-0">
+                <NeuralBackground
+                    color="#c96ef0" // Purple/pink from the gradient theme
+                    trailOpacity={0.1}
+                    particleCount={600}
+                    speed={0.8}
+                />
+            </div>
 
             {/* Background Gradient Orbs - Enhanced */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
