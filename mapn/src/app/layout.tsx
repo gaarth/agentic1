@@ -1,22 +1,23 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Figtree } from "next/font/google";
 import "./globals.css";
 
 import { SmoothScroll } from "@/components/providers/smooth-scroll";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const figtree = Figtree({
+  variable: "--font-figtree",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
-  title: "Mevolut Dashboard",
-  description: "High-performance fintech dashboard",
+  title: "Xtract - AI Automation Agency",
+  description: "Xtract is a modern AI automation agency, perfect for AI startups and tech businesses. Sleek, responsive, SEO-friendly, and designed to showcase AI solutions.",
+  openGraph: {
+    title: "Xtract - AI Automation Agency",
+    description: "Xtract is a modern AI automation agency, perfect for AI startups and tech businesses.",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -26,11 +27,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${figtree.variable} font-sans antialiased`}>
         <SmoothScroll>{children}</SmoothScroll>
       </body>
     </html>
   );
 }
+
