@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { HeroSection } from "@/components/sections/hero-section";
@@ -23,6 +24,20 @@ export default function Home() {
       </main>
       <Footer />
     </>
+=======
+import { MainLayout } from "@/components/layout/main-layout";
+import { DashboardView } from "@/components/views/dashboard-view";
+import { FeaturesSection } from "@/components/views/features-section";
+
+export default function Home() {
+  return (
+    <MainLayout>
+      <div className="space-y-20">
+        <DashboardView />
+        <FeaturesSection />
+      </div>
+    </MainLayout>
+>>>>>>> 730f146e1d55f38aa1c9e7bfd26a8aa81056acf0
   );
 }
 
