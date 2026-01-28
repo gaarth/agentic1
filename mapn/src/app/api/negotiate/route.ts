@@ -44,9 +44,14 @@ export async function POST(req: NextRequest) {
                 };
 
                 try {
-                    // Send initial state
+                    // Send initial state & asset metadata
                     let currentAllocation = engine.getInitialPortfolio();
-                    send({ type: 'init', negotiationId, initialAllocation: currentAllocation });
+                    send({
+                        type: 'init',
+                        negotiationId,
+                        initialAllocation: currentAllocation,
+                        assets: assets // Send asset definitions so frontend can calculate metrics
+                    });
 
                     const roundsLog: NegotiationRound[] = [];
 
