@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
+import { useTheme } from "next-themes";
 
 interface NeuralBackgroundProps {
     className?: string;
@@ -33,6 +34,7 @@ export default function NeuralBackground({
 }: NeuralBackgroundProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
+    const { theme } = useTheme();
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -147,9 +149,19 @@ export default function NeuralBackground({
         const animate = () => {
             // "Fade" effect: Instead of clearing the canvas, we draw a semi-transparent rect
             // This creates the "Trails" look.
-            // We use the background color of the parent or a dark overlay.
-            // Assuming dark mode for this effect usually:
-            ctx.fillStyle = `rgba(0, 0, 0, ${trailOpacity})`;
+
+            // Determine fade color based on active theme
+            const isLight = theme === "light";
+            // Use the CSS variable values roughly, or exact hexes
+            // Light: #F9FAFB (rgb(249, 250, 251))
+            // Dark: #000000
+
+            if (isLight) {
+                ctx.fillStyle = `rgba(249, 250, 251, ${trailOpacity})`;
+            } else {
+                ctx.fillStyle = `rgba(0, 0, 0, ${trailOpacity})`;
+            }
+
             ctx.fillRect(0, 0, width, height);
 
             particles.forEach((p) => {
@@ -192,10 +204,10 @@ export default function NeuralBackground({
             container.removeEventListener("mouseleave", handleMouseLeave);
             cancelAnimationFrame(animationFrameId);
         };
-    }, [color, trailOpacity, particleCount, speed]);
+    }, [color, trailOpacity, particleCount, speed, theme]);
 
     return (
-        <div ref={containerRef} className={cn("relative w-full h-full bg-black overflow-hidden", className)}>
+        <div ref={containerRef} className={cn("relative w-full h-full bg-background overflow-hidden", className)}>
             <canvas ref={canvasRef} className="block w-full h-full" />
         </div>
     );
