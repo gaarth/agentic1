@@ -11,11 +11,11 @@ const figtree = Figtree({
 });
 
 export const metadata: Metadata = {
-  title: "Xtract - AI Automation Agency",
-  description: "Xtract is a modern AI automation agency, perfect for AI startups and tech businesses. Sleek, responsive, SEO-friendly, and designed to showcase AI solutions.",
+  title: "MACANE - Multi-Agent Portfolio Manager",
+  description: "MACANE is a cutting-edge multi-agent portfolio manager. Optimize your investments with AI-driven risk assessment, growth strategies, and automated rebalancing.",
   openGraph: {
-    title: "Xtract - AI Automation Agency",
-    description: "Xtract is a modern AI automation agency, perfect for AI startups and tech businesses.",
+    title: "MACANE - Multi-Agent Portfolio Manager",
+    description: "MACANE is a cutting-edge multi-agent portfolio manager. Optimize your investments with AI-driven risk assessment, growth strategies, and automated rebalancing.",
     type: "website",
   },
 };

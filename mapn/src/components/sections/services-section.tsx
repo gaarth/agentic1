@@ -6,8 +6,8 @@ import { Workflow, LineChart, Bell, FileSearch } from "lucide-react"
 const services = [
     {
         icon: Workflow,
-        title: "Workflow Automation",
-        description: "Automate complex business processes with intelligent AI agents that learn and adapt."
+        title: "Automated Rebalancing",
+        description: "Intelligent agents automatically rebalance your portfolio to maintain your target asset allocation."
     },
     {
         icon: LineChart,
@@ -16,8 +16,8 @@ const services = [
     },
     {
         icon: Bell,
-        title: "Real-time Monitoring",
-        description: "Continuous monitoring with instant alerts and automated response protocols."
+        title: "Real-time Portfolio Monitoring",
+        description: "Continuous monitoring of assets with instant alerts and automated risk mitigation."
     },
     {
         icon: FileSearch,
@@ -52,10 +52,10 @@ export function ServicesSection() {
                 >
                     <span className="text-sm font-medium text-primary uppercase tracking-wider">Services</span>
                     <h2 className="text-4xl md:text-5xl font-semibold tracking-tight mt-4 mb-6">
-                        What We Offer
+                        What MACANE Offers
                     </h2>
                     <p className="text-lg text-muted-foreground max-w-[600px] mx-auto">
-                        Comprehensive AI automation solutions tailored to your business needs.
+                        Comprehensive multi-agent portfolio management solutions tailored to your investment goals.
                     </p>
                 </motion.div>
 
