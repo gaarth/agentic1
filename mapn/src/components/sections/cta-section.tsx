@@ -23,10 +23,10 @@ export function CTASection() {
                         <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight mb-6">
                             Ready to Transform
                             <br />
-                            Your Business?
+                            Your Portfolio?
                         </h2>
                         <p className="text-lg text-muted-foreground max-w-[500px] mx-auto mb-10">
-                            Start automating your workflows with AI-powered intelligence today.
+                            Start managing your wealth with AI-powered intelligence today.
                             No credit card required.
                         </p>
                         <Link

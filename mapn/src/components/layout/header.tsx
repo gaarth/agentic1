@@ -31,8 +31,8 @@ export function Header() {
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
                 className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
-                        ? "bg-background/80 backdrop-blur-xl border-b border-border"
-                        : "bg-transparent"
+                    ? "bg-background/80 backdrop-blur-xl border-b border-border"
+                    : "bg-transparent"
                     }`}
             >
                 <div className="max-w-[1200px] mx-auto px-10 py-4">
@@ -42,7 +42,7 @@ export function Header() {
                             <div className="w-[30px] h-[30px] rounded-lg bg-gradient-primary flex items-center justify-center">
                                 <span className="text-white font-bold text-sm">X</span>
                             </div>
-                            <span className="text-xl font-semibold text-foreground">Xtract</span>
+                            <span className="text-xl font-semibold text-foreground">MACANE</span>
                         </Link>
 
                         {/* Desktop Navigation */}

@@ -96,7 +96,7 @@ export function HeroSection() {
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 {/* Main rotating gradient orb */}
                 <div
-                    className="absolute top-1/2 left-1/2 w-[500px] h-[500px] rounded-full opacity-50 blur-[120px] animate-rotate-gradient"
+                    className="absolute top-1/2 left-1/2 w-[500px] h-[500px] rounded-full opacity-5 blur-[160px] animate-rotate-gradient"
                     style={{
                         background: 'linear-gradient(229deg, rgb(223, 122, 254) 13%, rgba(201, 110, 240, 0.3) 35%, rgba(164, 92, 219, 0.2) 64%, rgb(129, 74, 200) 88%)',
                         transform: 'translate(-50%, -50%)'
@@ -105,7 +105,7 @@ export function HeroSection() {
 
                 {/* Secondary pulsing orb */}
                 <div
-                    className="absolute top-1/2 left-1/2 w-[350px] h-[350px] rounded-full opacity-60 blur-[100px] animate-smooth-pulse"
+                    className="absolute top-1/2 left-1/2 w-[350px] h-[350px] rounded-full opacity-7 blur-[140px] animate-smooth-pulse"
                     style={{
                         background: 'linear-gradient(141deg, rgb(223, 122, 254) 13%, rgba(201, 110, 240, 0.4) 35%, rgba(164, 92, 219, 0.3) 64%, rgb(129, 74, 200) 88%)',
                         transform: 'translate(-50%, -50%)',
@@ -115,7 +115,7 @@ export function HeroSection() {
 
                 {/* Accent gradient orb with shift */}
                 <div
-                    className="absolute top-1/2 left-1/2 w-[250px] h-[250px] rounded-full opacity-40 blur-[80px] animate-float"
+                    className="absolute top-1/2 left-1/2 w-[250px] h-[250px] rounded-full opacity-4 blur-[120px] animate-float"
                     style={{
                         background: 'radial-gradient(circle, rgba(223, 122, 254, 0.6) 0%, rgba(129, 74, 200, 0.4) 70%, transparent 100%)',
                         transform: 'translate(-50%, -50%)',
@@ -134,7 +134,7 @@ export function HeroSection() {
                 <motion.div variants={itemVariants} className="mb-6">
                     <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-morphism text-sm font-medium text-muted-foreground cursor-interactive">
                         <span className="w-2 h-2 rounded-full bg-gradient-primary animate-smooth-pulse" />
-                        AI-Powered Automation
+                        Multi-Agent Portfolio Manager
                     </span>
                 </motion.div>
 
@@ -143,7 +143,7 @@ export function HeroSection() {
                     variants={itemVariants}
                     className="text-5xl md:text-6xl lg:text-7xl font-semibold tracking-tight leading-[1.1] mb-6"
                 >
-                    <span className="text-foreground depth-layer-3">Automate Your</span>
+                    <span className="text-foreground depth-layer-3">Smart Portfolio</span>
                     <br />
                     <span className="text-gradient depth-layer-2 inline-block animate-gradient-shift" style={{
                         background: 'linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end), var(--primary-gradient-start))',
@@ -151,7 +151,7 @@ export function HeroSection() {
                         WebkitTextFillColor: 'transparent',
                         backgroundClip: 'text'
                     }}>
-                        Business with AI
+                        Management with MACANE
                     </span>
                 </motion.h1>
 
@@ -160,8 +160,8 @@ export function HeroSection() {
                     variants={itemVariants}
                     className="text-lg md:text-xl text-muted-foreground max-w-[600px] mx-auto mb-10 depth-layer-1"
                 >
-                    Xtract leverages multi-agent AI systems to optimize your workflows,
-                    reduce costs, and drive intelligent decision-making at scale.
+                    MACANE leverages multi-agent AI systems to optimize your portfolio,
+                    reduce risks, and drive intelligent investment decisions at scale.
                 </motion.p>
 
                 {/* CTA Buttons with magnetic effect */}

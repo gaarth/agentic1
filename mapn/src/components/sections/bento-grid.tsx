@@ -39,10 +39,10 @@ export function BentoGrid() {
                 >
                     <span className="text-sm font-medium text-primary uppercase tracking-wider">How It Works</span>
                     <h2 className="text-4xl md:text-5xl font-semibold tracking-tight mt-4 mb-6">
-                        AI-Powered Negotiation
+                        Multi-Agent Portfolio Intelligence
                     </h2>
                     <p className="text-lg text-muted-foreground max-w-[600px] mx-auto">
-                        Our multi-agent system collaborates to find optimal solutions through intelligent negotiation.
+                        Depending on your goals, our multi-agent system collaborates to construct and maintain optimal portfolios.
                     </p>
                 </motion.div>
 
@@ -66,7 +66,7 @@ export function BentoGrid() {
                                 </div>
                                 <h3 className="text-2xl font-semibold mb-3">Agent Collaboration</h3>
                                 <p className="text-muted-foreground leading-relaxed max-w-md">
-                                    Four specialized agents work in parallel, each contributing their expertise to reach consensus on optimal decisions.
+                                    Four specialized agents work in parallel, each contributing their expertise to reach consensus on optimal investment decisions.
                                 </p>
                             </div>
                             <div className="flex-shrink-0 w-full md:w-[300px] h-[150px] rounded-xl bg-muted/50 border border-border flex items-center justify-center">

@@ -3,7 +3,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Xtract Design Tokens - extracted from textfile_design */
+/* MACANE Design Tokens - extracted from textfile_design */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -46,7 +46,7 @@
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
 
-  /* Xtract specific tokens */
+  /* MACANE specific tokens */
   --color-primary-gradient-start: var(--primary-gradient-start);
   --color-primary-gradient-end: var(--primary-gradient-end);
 }
@@ -54,7 +54,7 @@
 :root {
   --radius: 1rem;
 
-  /* Xtract Dark-First Design - Purple/Magenta palette */
+  /* MACANE Dark-First Design - Purple/Magenta palette */
   --background: #000000;
   --foreground: #ffffff;
   --card: rgba(13, 13, 13, 0.8);
@@ -96,7 +96,7 @@
   --sidebar-ring: rgb(129, 74, 200);
 }
 
-/* Xtract uses dark mode by default, but support light mode override */
+/* MACANE uses dark mode by default, but support light mode override */
 .light {
   --background: #F9FAFB;
   --foreground: #111827;
@@ -161,12 +161,12 @@
   }
 
   50% {
-    transform: translate(-50%, -50%) scale(1.1);
+    transform: translate(-50%, -50%) scale(1.03);
   }
 }
 
 .animate-float {
-  animation: float 6s ease-in-out infinite;
+  animation: float 40s ease-in-out infinite;
 }
 
 /* Advanced Animations - Framer-inspired */
@@ -187,7 +187,7 @@
 }
 
 .animate-rotate-gradient {
-  animation: rotate-gradient 20s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation: rotate-gradient 160s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 /* Smooth pulse with scale */
@@ -200,13 +200,13 @@
   }
 
   50% {
-    opacity: 0.8;
-    transform: scale(1.05);
+    opacity: 0.9;
+    transform: scale(1.02);
   }
 }
 
 .animate-smooth-pulse {
-  animation: smooth-pulse 4s ease-in-out infinite;
+  animation: smooth-pulse 32s ease-in-out infinite;
 }
 
 /* Float with subtle rotation */

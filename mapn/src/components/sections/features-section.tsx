@@ -70,7 +70,7 @@ export function FeaturesSection() {
                         Multi-Agent AI System
                     </h2>
                     <p className="text-lg text-muted-foreground max-w-[600px] mx-auto">
-                        Four specialized AI agents work together to analyze, optimize, and manage your portfolio with unprecedented precision.
+                        Four specialized AI agents work together to analyze, optimize, and manage your investment portfolio with unprecedented precision.
                     </p>
                 </motion.div>
 

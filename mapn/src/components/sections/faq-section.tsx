@@ -11,11 +11,11 @@ import {
 const faqs = [
     {
         question: "How does the multi-agent system work?",
-        answer: "Our system uses four specialized AI agents (Risk, Growth, Compliance, and Liquidity) that analyze data from their unique perspectives. A supervisor agent then synthesizes their recommendations to reach an optimal consensus."
+        answer: "Our system uses four specialized AI agents (Risk, Growth, Compliance, and Liquidity) that analyze market data from their unique perspectives. A supervisor agent then synthesizes their recommendations to reach an optimal consensus."
     },
     {
-        question: "What kind of data does Xtract analyze?",
-        answer: "Xtract can analyze portfolio data, market trends, risk metrics, compliance requirements, and liquidity indicators. The system is designed to work with your existing data sources."
+        question: "What kind of data does MACANE analyze?",
+        answer: "MACANE can analyze portfolio data, market trends, risk metrics, compliance requirements, and liquidity indicators. The system is designed to work with your existing data sources."
     },
     {
         question: "How long does it take to see results?",
