@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
-import { Menu, X } from "lucide-react"
+import { Menu, X, Settings } from "lucide-react"
+import { ThemeSlider } from "@/components/ui/theme-slider"
 
 const navItems = [
     { label: "Services", href: "#services" },
@@ -15,6 +16,7 @@ const navItems = [
 export function Header() {
     const [isScrolled, setIsScrolled] = useState(false)
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false)
 
     useEffect(() => {
         const handleScroll = () => {
@@ -66,6 +68,38 @@ export function Header() {
                             >
                                 Get Started
                             </Link>
+
+                            <div className="relative">
+                                <button
+                                    onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+                                    className="p-2 text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-secondary/50"
+                                    aria-label="Settings"
+                                >
+                                    <Settings size={20} />
+                                </button>
+
+                                <AnimatePresence>
+                                    {isSettingsOpen && (
+                                        <motion.div
+                                            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                                            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                                            transition={{ duration: 0.2 }}
+                                            className="absolute right-0 top-full mt-2 w-56 rounded-xl bg-card border border-border p-4 shadow-xl z-50 glass-morphism"
+                                        >
+                                            <div className="flex items-center justify-between mb-2">
+                                                <span className="text-sm font-medium text-foreground">Settings</span>
+                                            </div>
+                                            <div className="flex items-center justify-between p-2 rounded-lg bg-secondary/30">
+                                                <span className="text-sm text-muted-foreground flex items-center gap-2">
+                                                    Mode
+                                                </span>
+                                                <ThemeSlider />
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
                         </div>
 
                         {/* Mobile Menu Button */}

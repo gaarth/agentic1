@@ -3,6 +3,7 @@ import { Figtree } from "next/font/google";
 import "./globals.css";
 
 import { SmoothScroll } from "@/components/providers/smooth-scroll";
+import { ThemeProvider } from "@/components/providers/theme-provider";
 
 const figtree = Figtree({
   variable: "--font-figtree",
@@ -28,7 +29,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${figtree.variable} font-sans antialiased`}>
-        <SmoothScroll>{children}</SmoothScroll>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem={false}
+          disableTransitionOnChange
+        >
+          <SmoothScroll>{children}</SmoothScroll>
+        </ThemeProvider>
       </body>
     </html>
   );
