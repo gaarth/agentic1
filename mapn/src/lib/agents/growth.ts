@@ -8,7 +8,7 @@ export class GrowthAgent extends BaseAgent {
             name: 'Growth Agent',
             role: 'Portfolio Manager',
             persona: GROWTH_AGENT_PROMPT,
-            llmProvider: 'nemotron'
+            llmProvider: 'mistral'
         });
     }
 

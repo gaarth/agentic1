@@ -8,7 +8,7 @@ export class ComplianceAgent extends BaseAgent {
             name: 'Compliance Agent',
             role: 'Compliance Officer',
             persona: COMPLIANCE_AGENT_PROMPT,
-            llmProvider: 'nemotron' // Strict checking
+            llmProvider: 'mistral' // Mistral AI for strict compliance checking
         });
     }
 

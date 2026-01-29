@@ -1,17 +1,20 @@
+'use client'
+
 import { ReactNode } from "react"
-import { Sidebar } from "./sidebar"
-import { InsightPanel } from "./insight-panel"
+import { motion } from "framer-motion"
 
 export function MainLayout({ children }: { children: ReactNode }) {
     return (
-        <div className="flex bg-background min-h-screen font-sans selection:bg-primary/20">
-            <Sidebar />
-            <main className="flex-1 min-w-0">
-                <div className="p-6 md:p-8 lg:p-10 mx-auto max-w-6xl">
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="bg-background min-h-screen font-sans selection:bg-primary/20"
+        >
+            <main className="min-w-0">
+                <div className="p-4 md:p-6 lg:p-8 mx-auto max-w-7xl">
                     {children}
                 </div>
             </main>
-            <InsightPanel />
-        </div>
+        </motion.div>
     )
 }

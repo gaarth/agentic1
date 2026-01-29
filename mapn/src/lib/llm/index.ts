@@ -1,7 +1,7 @@
 import { generateWithGemini, generateJSONWithGemini } from './gemini';
-import { generateWithNemotron, generateJSONWithNemotron } from './nemotron';
+import { generateWithMistral, generateJSONWithMistral } from './mistral';
 
-export type LLMProvider = 'gemini' | 'nemotron';
+export type LLMProvider = 'gemini' | 'mistral';
 
 export interface CompletionOptions {
     provider?: LLMProvider;
@@ -9,22 +9,36 @@ export interface CompletionOptions {
     json?: boolean;
 }
 
+/**
+ * Generate a completion using the specified LLM provider
+ * Default: gemini (recommended - no additional setup required)
+ * Alternative: mistral (requires HuggingFace paid provider)
+ */
 export async function generateCompletion(prompt: string, options: CompletionOptions = {}): Promise<string> {
     const provider = options.provider || 'gemini';
 
-    if (provider === 'gemini') {
-        return generateWithGemini(prompt, options.systemInstruction);
+    if (provider === 'mistral') {
+        return generateWithMistral(prompt, options.systemInstruction);
     } else {
-        return generateWithNemotron(prompt, options.systemInstruction);
+        return generateWithGemini(prompt, options.systemInstruction);
     }
 }
 
+/**
+ * Generate a JSON completion using the specified LLM provider
+ * Default: gemini (recommended - no additional setup required)
+ * Alternative: mistral (requires HuggingFace paid provider)
+ */
 export async function generateJSONCompletion<T>(prompt: string, options: CompletionOptions = {}): Promise<T> {
     const provider = options.provider || 'gemini';
 
-    if (provider === 'gemini') {
-        return generateJSONWithGemini<T>(prompt, options.systemInstruction);
+    if (provider === 'mistral') {
+        return generateJSONWithMistral<T>(prompt, options.systemInstruction);
     } else {
-        return generateJSONWithNemotron<T>(prompt, options.systemInstruction);
+        return generateJSONWithGemini<T>(prompt, options.systemInstruction);
     }
 }
+
+// Re-export individual functions for direct access
+export { generateWithGemini, generateJSONWithGemini } from './gemini';
+export { generateWithMistral, generateJSONWithMistral } from './mistral';

@@ -170,7 +170,7 @@ export function HeroSection() {
                     className="flex flex-col sm:flex-row items-center justify-center gap-4"
                 >
                     <MagneticButton href="/dashboard" variant="primary">
-                        Start Free Trial
+                        Start Session
                     </MagneticButton>
                     <MagneticButton href="#features" variant="secondary">
                         Learn More
