@@ -8,7 +8,7 @@ export class RiskAgent extends BaseAgent {
             name: 'Risk Agent',
             role: 'Risk Manager',
             persona: RISK_AGENT_PROMPT,
-            llmProvider: 'nemotron' // Nemotron is good for reasoning/math
+            llmProvider: 'mistral' // Mistral AI Free Experiment Tier
         });
     }
 

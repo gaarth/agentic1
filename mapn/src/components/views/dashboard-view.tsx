@@ -1,85 +1,95 @@
 'use client'
 
-import { useState, useRef, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from "framer-motion"
-import { MoreHorizontal, ArrowUpRight, ArrowDownRight, Play, Loader2, RefreshCw } from "lucide-react"
+import { TrendingUp, Newspaper, Calendar, Bot, Play, Loader2, RefreshCw, Activity, CheckCircle2 } from "lucide-react"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+
+import { MarketTicker, StockWatchlist } from '@/components/dashboard/market-data';
+import { NewsTicker } from '@/components/dashboard/news-ticker';
+import { NewsFeed } from '@/components/dashboard/news-feed';
+import { EconomicCalendar } from '@/components/dashboard/economic-calendar';
 
 // Types derived from backend
 interface Asset {
     symbol: string;
-    name: string;
     expected_return: number;
     volatility: number;
     esg_score: number;
-    liquidity_score: number;
 }
 
 interface RoundLog {
     round_number: number;
-    agent_bids: Record<string, any>;
     proposed_allocation: Record<string, number>;
     consensus_reached: boolean;
 }
 
+type TabType = 'negotiation' | 'markets' | 'news' | 'calendar';
+
+const tabs = [
+    { id: 'negotiation' as TabType, label: 'Negotiation', icon: Bot },
+    { id: 'markets' as TabType, label: 'Markets', icon: TrendingUp },
+    { id: 'news' as TabType, label: 'News', icon: Newspaper },
+    { id: 'calendar' as TabType, label: 'Calendar', icon: Calendar },
+];
+
+const THINKING_PHRASES = [
+    "Risk Agent analyzing portfolio variance...",
+    "Growth Agent identifying high-yield opportunities...",
+    "Compliance Agent verifying ESG mandates...",
+    "Liquidity Agent assessing market depth...",
+    "Supervisor Agent synthesizing strategy...",
+    "Optimizing Sharpe ratio...",
+    "Projecting future cash flows...",
+    "Stress testing portfolio resilience...",
+    "Rebalancing sector weights...",
+    "Calculating beta coefficients...",
+    "Evaluating macroeconomic indicators...",
+    "Checking regulatory compliance..."
+];
+
 export function DashboardView() {
-    // State
+    const [activeTab, setActiveTab] = useState<TabType>('negotiation');
     const [status, setStatus] = useState<'idle' | 'running' | 'completed' | 'error'>('idle');
     const [assets, setAssets] = useState<Asset[]>([]);
     const [allocation, setAllocation] = useState<Record<string, number>>({});
-    const [logs, setLogs] = useState<RoundLog[]>([]);
-    const [messages, setMessages] = useState<string[]>([]);
     const [negotiationId, setNegotiationId] = useState<string | null>(null);
+
+    // Thinking Animation State
+    const [thinkingMessage, setThinkingMessage] = useState("");
+    const usedPhrases = useRef<Set<string>>(new Set());
 
     // Metrics Calculation
     const metrics = useMemo(() => {
         if (Object.keys(allocation).length === 0 || assets.length === 0) return null;
-
-        let totalWeight = 0;
-        let weightedReturn = 0;
-        let weightedVol = 0;
-        let weightedESG = 0;
-
+        let totalWeight = 0, wRet = 0, wVol = 0, wESG = 0;
         Object.entries(allocation).forEach(([symbol, weight]) => {
             const asset = assets.find(a => a.symbol === symbol);
             if (asset) {
-                weightedReturn += asset.expected_return * weight;
-                weightedVol += asset.volatility * weight; // Simplified vol calc (ignoring covariance)
-                weightedESG += asset.esg_score * weight;
+                wRet += asset.expected_return * weight;
+                wVol += asset.volatility * weight;
+                wESG += asset.esg_score * weight;
                 totalWeight += weight;
             }
         });
-
-        // Normalize if needed, though weights should sum to 100
-        const factor = totalWeight > 0 ? 100 / totalWeight : 1;
-
-        return {
-            yield: (weightedReturn * factor) / 100, // as percentage
-            volatility: (weightedVol * factor) / 100,
-            esg: (weightedESG * factor) / 100
-        };
-
+        const f = totalWeight > 0 ? 100 / totalWeight : 1;
+        return { yield: (wRet * f) / 100, volatility: (wVol * f) / 100, esg: (wESG * f) / 100 };
     }, [allocation, assets]);
 
     const startNegotiation = async () => {
         setStatus('running');
-        setLogs([]);
-        setMessages([]);
-        setAllocation({}); // Reset or keep previous? Resetting visually better.
+        setAllocation({});
+        setThinkingMessage("Initializing Agents...");
+        usedPhrases.current.clear();
 
         try {
             const res = await fetch('/api/negotiate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    capital: 100000,
-                    max_volatility: 12,
-                    esg_minimum: 70
-                })
+                body: JSON.stringify({ capital: 100000, max_volatility: 12, esg_minimum: 70 })
             });
 
             if (!res.body) throw new Error("No stream");
-
             const reader = res.body.getReader();
             const decoder = new TextDecoder();
             let buffer = '';
@@ -87,25 +97,19 @@ export function DashboardView() {
             while (true) {
                 const { done, value } = await reader.read();
                 if (done) break;
-
                 buffer += decoder.decode(value, { stream: true });
                 const lines = buffer.split('\n');
-                buffer = lines.pop() || ''; // Keep partial line
-
+                buffer = lines.pop() || '';
                 for (const line of lines) {
-                    if (!line.trim()) continue;
-                    try {
-                        const event = JSON.parse(line);
-                        handleEvent(event);
-                    } catch (e) {
-                        console.error("Parse error", e);
-                    }
+                    if (line.trim()) handleEvent(JSON.parse(line));
                 }
             }
             setStatus('completed');
+            setThinkingMessage("Negotiation Complete.");
         } catch (err) {
             console.error(err);
             setStatus('error');
+            setThinkingMessage("Error in connection.");
         }
     };
 
@@ -115,183 +119,254 @@ export function DashboardView() {
                 setNegotiationId(event.negotiationId);
                 setAssets(event.assets || []);
                 setAllocation(event.initialAllocation);
-                setMessages(prev => [...prev, "Negotiation initialized."]);
-                break;
-            case 'status':
-                setMessages(prev => [...prev, event.message]);
                 break;
             case 'round':
-                setLogs(prev => [...prev, event.data]);
-                setAllocation(event.data.proposed_allocation); // Update live chart
+                setAllocation(event.data.proposed_allocation);
                 break;
             case 'done':
                 setAllocation(event.finalAllocation);
-                setMessages(prev => [...prev, "Negotiation complete."]);
                 break;
             case 'error':
                 setStatus('error');
-                setMessages(prev => [...prev, `Error: ${event.message}`]);
                 break;
         }
     };
 
-    // Chart Data Preparation
+    // Thinking Message Cycler
+    useEffect(() => {
+        if (status !== 'running') return;
+
+        const cycleMessage = () => {
+            const available = THINKING_PHRASES.filter(p => !usedPhrases.current.has(p));
+            if (available.length === 0) {
+                usedPhrases.current.clear(); // Reset if all used
+                return;
+            }
+            const next = available[Math.floor(Math.random() * available.length)];
+            usedPhrases.current.add(next);
+            setThinkingMessage(next);
+        };
+
+        cycleMessage(); // Initial
+        const interval = setInterval(cycleMessage, 2500); // Change every 2.5s
+        return () => clearInterval(interval);
+    }, [status]);
+
     const chartData = useMemo(() => {
         return Object.entries(allocation)
             .map(([symbol, weight]) => ({ name: symbol, weight }))
-            .sort((a, b) => b.weight - a.weight) // Sort by weight desc
-            .filter(i => i.weight > 0); // Hide zero positions
+            .sort((a, b) => b.weight - a.weight)
+            .filter(i => i.weight > 0);
     }, [allocation]);
 
     return (
-        <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="space-y-6 max-w-7xl mx-auto"
-        >
-            {/* Header */}
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-2xl font-semibold tracking-tight text-foreground">Portfolio Negotiation</h1>
-                    <p className="text-sm text-muted-foreground">
-                        {status === 'idle' ? 'Ready to initialize agents.' :
-                            status === 'running' ? 'Agents are negotiating...' :
-                                'Negotiation session complete.'}
-                    </p>
-                </div>
-                <div className="flex gap-3">
-                    <button
-                        onClick={startNegotiation}
-                        disabled={status === 'running'}
-                        className="flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-[12px] text-sm font-medium hover:brightness-110 transition-all shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        {status === 'running' ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> :
-                            status === 'completed' ? <RefreshCw className="w-4 h-4 mr-2" /> :
-                                <Play className="w-4 h-4 mr-2" />}
-                        {status === 'running' ? 'Negotiating...' : 'Start Session'}
-                    </button>
-                </div>
+        <div className="space-y-6">
+            {/* Top Sliders Section */}
+            <div className="space-y-4">
+                <MarketTicker />
+                <NewsTicker />
             </div>
 
-            {/* Main Visuals Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[400px]">
-                {/* Chart */}
-                <div className="lg:col-span-2 glass-panel p-6 rounded-[24px] relative flex flex-col">
-                    <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">Live Allocation</h2>
-                    <div className="flex-1 w-full min-h-0">
-                        {chartData.length > 0 ? (
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={chartData}>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" opacity={0.4} />
-                                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} dy={10} />
-                                    <YAxis hide domain={[0, 40]} />
-                                    <Tooltip
-                                        contentStyle={{ backgroundColor: 'hsl(var(--background))', borderRadius: '12px', border: '1px solid hsl(var(--border))' }}
-                                        cursor={{ fill: 'hsl(var(--primary))', opacity: 0.1 }}
-                                    />
-                                    <Bar dataKey="weight" radius={[4, 4, 0, 0]}>
-                                        {chartData.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={`hsl(var(--primary) / ${0.3 + (entry.weight / 20)})`} />
-                                        ))}
-                                    </Bar>
-                                </BarChart>
-                            </ResponsiveContainer>
-                        ) : (
-                            <div className="h-full flex items-center justify-center text-muted-foreground/30 text-sm">
-                                Press Start to Initialize Portfolio
-                            </div>
-                        )}
+            {/* Main Dashboard Content */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="max-w-7xl mx-auto"
+            >
+                {/* Header & Controls */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 mt-6 px-4">
+                    <div>
+                        <h1 className="text-3xl font-bold tracking-tight text-foreground">MACANE Dashboard</h1>
+                        <p className="text-muted-foreground mt-1">Autonomous Multi-Agent Portfolio Manager</p>
+                    </div>
+
+                    <div className="flex gap-4 items-center">
+                        {/* Tab Navigation */}
+                        <div className="flex items-center bg-secondary/50 rounded-xl p-1">
+                            {tabs.map((tab) => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id)}
+                                    className={`relative flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 ${activeTab === tab.id
+                                        ? 'text-primary-foreground'
+                                        : 'text-muted-foreground hover:text-foreground'
+                                        }`}
+                                >
+                                    {activeTab === tab.id && (
+                                        <motion.div
+                                            layoutId="activeTab"
+                                            className="absolute inset-0 bg-primary rounded-lg"
+                                            transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                        />
+                                    )}
+                                    <tab.icon className="w-4 h-4 relative z-10" />
+                                    <span className="relative z-10 hidden sm:inline">{tab.label}</span>
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </div>
 
-                {/* Metrics */}
-                <div className="flex flex-col gap-6">
-                    <MetricCard
-                        label="Exp. Return (Yield)"
-                        value={metrics ? `${metrics.yield.toFixed(1)}%` : '--'}
-                        sub="Weighted Avg"
-                        positive={true}
-                    />
-                    <MetricCard
-                        label="Volatility (Risk)"
-                        value={metrics ? `${metrics.volatility.toFixed(1)}%` : '--'}
-                        sub="Target < 12%"
-                        positive={metrics ? metrics.volatility < 12 : true}
-                        invertColor
-                    />
-                    <MetricCard
-                        label="ESG Score"
-                        value={metrics ? metrics.esg.toFixed(0) : '--'}
-                        sub="Target > 70"
-                        positive={true}
-                    />
-                </div>
-            </div>
+                {/* Tab Content */}
+                <AnimatePresence mode="wait">
+                    {activeTab === 'negotiation' && (
+                        <motion.div
+                            key="negotiation"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="space-y-6 px-4"
+                        >
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                {/* Main Chart Area */}
+                                <div className="lg:col-span-2 glass-panel p-8 rounded-[24px] min-h-[650px] flex flex-col relative overflow-hidden">
+                                    <div className="flex justify-between items-center mb-6">
+                                        <h2 className="text-lg font-semibold flex items-center gap-2">
+                                            <Activity className="w-5 h-5 text-primary" />
+                                            Live Allocation
+                                        </h2>
+                                        <button
+                                            onClick={startNegotiation}
+                                            disabled={status === 'running'}
+                                            className="flex items-center px-6 py-2.5 bg-primary text-primary-foreground rounded-full text-sm font-medium hover:scale-105 transition-all shadow-lg shadow-primary/25 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                                        >
+                                            {status === 'running' ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> :
+                                                status === 'completed' ? <RefreshCw className="w-4 h-4 mr-2" /> :
+                                                    <Play className="w-4 h-4 mr-2" />}
+                                            {status === 'running' ? 'Negotiating...' : 'Start Negotiation'}
+                                        </button>
+                                    </div>
 
-            {/* Logs / Stream */}
-            <div className="glass-panel rounded-[24px] p-6 min-h-[300px]">
-                <h3 className="text-lg font-medium mb-4">Negotiation Feed</h3>
-                <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                    <AnimatePresence mode='popLayout'>
-                        {messages.map((msg, i) => (
-                            <motion.div
-                                key={`msg-${i}`}
-                                initial={{ opacity: 0, x: -10 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                className="text-sm text-muted-foreground border-l-2 border-primary/20 pl-3 py-1"
-                            >
-                                {msg}
-                            </motion.div>
-                        ))}
-                        {logs.map((round) => (
-                            <motion.div
-                                key={`round-${round.round_number}`}
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                className="bg-secondary/30 rounded-xl p-4 border border-border/50"
-                            >
-                                <div className="flex justify-between mb-2">
-                                    <span className="font-semibold text-primary">Round {round.round_number}</span>
-                                    <span className="text-xs text-muted-foreground uppercase">{round.consensus_reached ? 'Consensus Reached' : 'Debate Ongoing'}</span>
+                                    <div className="flex-1 w-full relative z-10">
+                                        {chartData.length > 0 ? (
+                                            <ResponsiveContainer width="100%" height="100%">
+                                                <BarChart data={chartData}>
+                                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" opacity={0.3} />
+                                                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} dy={10} />
+                                                    <YAxis hide domain={[0, 45]} />
+                                                    <Tooltip
+                                                        cursor={{ fill: 'hsl(var(--muted))', opacity: 0.2 }}
+                                                        contentStyle={{
+                                                            backgroundColor: 'hsl(var(--background))',
+                                                            borderRadius: '12px',
+                                                            border: '1px solid hsl(var(--border))',
+                                                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                                                        }}
+                                                    />
+                                                    {/* Off-white/Grey Bars */}
+                                                    <Bar dataKey="weight" radius={[6, 6, 0, 0]} animationDuration={1000}>
+                                                        {chartData.map((entry, index) => (
+                                                            <Cell key={`cell-${index}`} fill="#e5e5e5" /> // Off-white grey
+                                                        ))}
+                                                    </Bar>
+                                                </BarChart>
+                                            </ResponsiveContainer>
+                                        ) : (
+                                            <div className="h-full flex flex-col items-center justify-center text-muted-foreground/40">
+                                                <Bot className="w-16 h-16 mb-4 opacity-20" />
+                                                <p>Initiate negotiation to generate portfolio</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Thinking Overlay Status */}
+                                    <div className="mt-6 h-12 flex items-center justify-center">
+                                        <AnimatePresence mode="wait">
+                                            {status === 'running' && (
+                                                <motion.div
+                                                    key={thinkingMessage}
+                                                    initial={{ opacity: 0, y: 10 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    exit={{ opacity: 0, y: -10 }}
+                                                    className="text-lg font-medium text-primary flex items-center gap-3 bg-secondary/30 px-6 py-2 rounded-full border border-primary/10"
+                                                >
+                                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                                    {thinkingMessage}
+                                                </motion.div>
+                                            )}
+                                            {status === 'completed' && (
+                                                <motion.div
+                                                    initial={{ opacity: 0, scale: 0.9 }}
+                                                    animate={{ opacity: 1, scale: 1 }}
+                                                    className="text-lg font-medium text-green-500 flex items-center gap-2"
+                                                >
+                                                    <CheckCircle2 className="w-5 h-5" />
+                                                    Optimization Complete
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+                                    </div>
                                 </div>
-                                <div className="space-y-2">
-                                    {Object.entries(round.agent_bids).map(([agent, bid]: [string, any]) => (
-                                        <div key={agent} className="text-xs flex gap-2">
-                                            <span className="font-medium w-20 uppercase shrink-0 text-muted-foreground">{agent}</span>
-                                            <span className="opacity-80">{bid.reasoning?.substring(0, 120)}...</span>
-                                        </div>
-                                    ))}
+
+                                {/* Metrics Side */}
+                                <div className="flex flex-col gap-6">
+                                    <MetricCard
+                                        label="Exp. Return (Yield)"
+                                        value={metrics ? `${metrics.yield.toFixed(1)}%` : '--'}
+                                        sub="Weighted Avg"
+                                        positive={true}
+                                    />
+                                    <MetricCard
+                                        label="Volatility (Risk)"
+                                        value={metrics ? `${metrics.volatility.toFixed(1)}%` : '--'}
+                                        sub="Target < 12%"
+                                        positive={metrics ? metrics.volatility < 12 : true}
+                                        invertColor
+                                    />
+                                    <MetricCard
+                                        label="ESG Score"
+                                        value={metrics ? metrics.esg.toFixed(0) : '--'}
+                                        sub="Target > 70"
+                                        positive={true}
+                                    />
                                 </div>
-                            </motion.div>
-                        ))}
-                    </AnimatePresence>
-                    {status === 'idle' && (
-                        <div className="text-center py-10 text-muted-foreground/40 text-sm">
-                            Waiting for session start...
-                        </div>
+                            </div>
+                        </motion.div>
                     )}
-                </div>
-            </div>
-        </motion.div>
+
+                    {activeTab === 'markets' && (
+                        <motion.div key="markets" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="px-4">
+                            <StockWatchlist />
+                        </motion.div>
+                    )}
+
+                    {activeTab === 'news' && (
+                        <motion.div key="news" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="h-[700px] px-4">
+                            <NewsFeed />
+                        </motion.div>
+                    )}
+
+                    {activeTab === 'calendar' && (
+                        <motion.div key="calendar" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="h-[700px] px-4">
+                            <EconomicCalendar />
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </motion.div>
+        </div>
     )
 }
 
 function MetricCard({ label, value, sub, positive, invertColor }: any) {
     const isPositive = invertColor ? !positive : positive;
-    const colorClass = isPositive ? 'text-primary' : 'text-destructive';
 
     return (
         <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="glass-panel p-6 rounded-[20px] flex-1 flex flex-col justify-center"
+            className="glass-panel p-8 rounded-[24px] flex-1 flex flex-col justify-center relative overflow-hidden group hover:border-primary/20 transition-colors"
         >
-            <p className="text-sm text-muted-foreground font-medium mb-1">{label}</p>
-            <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-bold">{value}</span>
-                <span className={`text-xs ${colorClass} bg-secondary px-1.5 py-0.5 rounded-md`}>
-                    {sub}
-                </span>
+            <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                <Activity className="w-12 h-12" />
+            </div>
+            <p className="text-sm text-muted-foreground font-medium mb-2 uppercase tracking-wide">{label}</p>
+            <div className="flex flex-col gap-1">
+                <span className="text-4xl font-bold tracking-tight">{value}</span>
+                <div className="flex items-center gap-2">
+                    <span className={`w-2 h-2 rounded-full ${isPositive ? 'bg-green-500' : 'bg-red-500'}`} />
+                    <span className="text-sm text-muted-foreground">{sub}</span>
+                </div>
             </div>
         </motion.div>
     )

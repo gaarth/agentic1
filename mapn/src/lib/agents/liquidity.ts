@@ -8,7 +8,7 @@ export class LiquidityAgent extends BaseAgent {
             name: 'Liquidity Agent',
             role: 'Head of Trading',
             persona: LIQUIDITY_AGENT_PROMPT,
-            llmProvider: 'nemotron'
+            llmProvider: 'mistral'
         });
     }
 

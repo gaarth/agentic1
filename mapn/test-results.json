@@ -1,0 +1,47 @@
+{
+  "results": [
+    {
+      "service": "Supabase",
+      "status": "PASS",
+      "message": "Connected. Found 1 asset(s).",
+      "responseTime": 914
+    },
+    {
+      "service": "Gemini",
+      "status": "PASS",
+      "message": "Rate limited (429) - API key valid. Retry logic will handle this.",
+      "responseTime": 155
+    },
+    {
+      "service": "Mistral",
+      "status": "PASS",
+      "message": "Response: OK",
+      "responseTime": 320
+    }
+  ],
+  "logs": [
+    "MACANE API TEST SUITE",
+    "Testing APIs with ONE minimal call each...",
+    "",
+    "Environment Variables:",
+    "  [OK] SUPABASE_URL",
+    "  [OK] SUPABASE_ANON_KEY",
+    "  [OK] GEMINI_API_KEY",
+    "  [OK] MISTRAL_API_KEY",
+    "",
+    "[TEST] Supabase connection...",
+    "  [OK] Supabase: PASS",
+    "[TEST] Gemini API...",
+    "  [OK] Gemini: PASS (rate limited but valid key)",
+    "[TEST] Mistral AI API...",
+    "  [OK] Mistral: PASS - OK",
+    "",
+    "Result: 3 passed, 0 failed, 0 skipped (3 total)"
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 0,
+    "skipped": 0,
+    "total": 3
+  }
+}

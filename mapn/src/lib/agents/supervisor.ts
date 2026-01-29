@@ -69,7 +69,7 @@ export class SupervisorAgent {
                 explanation: string;
                 consensus: boolean;
             }>(prompt, {
-                provider: 'gemini', // Supervisor uses Gemini 2.0 Flash
+                provider: 'mistral', // Supervisor uses Mistral AI (with Gemini fallback)
                 systemInstruction: "You are an expert Portfolio Manager orchestrating a team of AI agents."
             });
         } catch (error) {
