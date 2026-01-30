@@ -49,7 +49,7 @@ Provide:
 3. Recommendations for rebalancing
 `
 
-    const analysis = await generateCompletion(prompt, 'You are a professional portfolio analyst.')
+    const analysis = await generateCompletion(prompt, { systemInstruction: 'You are a professional portfolio analyst.' })
 
     // Store analysis in database
     await supabase.from('portfolio_analyses').insert({
@@ -86,7 +86,7 @@ Return as JSON array with: { symbol, name, sector, reason, allocation_percent }`
 
     const recommendations = await generateJSONCompletion<Recommendation[]>(
         prompt,
-        'You are a financial advisor. Only recommend real stock symbols.'
+        { systemInstruction: 'You are a financial advisor. Only recommend real stock symbols.' }
     )
 
     // Get real-time quotes for recommended stocks
@@ -163,7 +163,7 @@ Provide a concise 3-paragraph market summary covering:
 
     const summary = await generateCompletion(
         prompt,
-        'You are a financial news analyst providing daily market summaries.'
+        { systemInstruction: 'You are a financial news analyst providing daily market summaries.' }
     )
 
     return summary

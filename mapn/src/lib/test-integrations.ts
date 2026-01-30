@@ -14,7 +14,7 @@ export async function testGeminiAPI() {
     try {
         const response = await generateCompletion(
             'What are the top 3 quality indicators for evaluating stocks? Be concise.',
-            'You are a financial analyst.'
+            { systemInstruction: 'You are a financial analyst.' }
         )
         console.log('✅ Gemini API working!')
         console.log('Response:', response.substring(0, 100) + '...')

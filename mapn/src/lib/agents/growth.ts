@@ -36,11 +36,11 @@ export class GrowthAgent extends BaseAgent {
             },
             available_assets: assets.map(a => ({
                 symbol: a.symbol,
-                expected_return: a.expected_return,
-                volatility: a.volatility,
-                esg_score: a.esg_score,
-                sector: a.sector
-            })).sort((a, b) => b.expected_return - a.expected_return),
+                expected_return: a.expected_return || 0,
+                volatility: a.volatility || 0,
+                esg_score: a.esg_score || 0,
+                sector: a.sector || 'Unknown'
+            })).sort((a, b) => (b.expected_return || 0) - (a.expected_return || 0)),
             round: roundNumber,
             action_required: isBelowTarget ? 'INCREASE_RETURN' : 'MAINTAIN'
         }, null, 2);
@@ -78,8 +78,8 @@ export class GrowthAgent extends BaseAgent {
         Object.entries(allocation).forEach(([symbol, weight]) => {
             const asset = assets.find(a => a.symbol === symbol);
             if (asset && weight > 0) {
-                expectedReturn += asset.expected_return * weight;
-                volatility += asset.volatility * weight;
+                expectedReturn += (asset.expected_return || 0) * weight;
+                volatility += (asset.volatility || 0) * weight;
                 totalWeight += weight;
             }
         });

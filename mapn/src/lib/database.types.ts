@@ -11,31 +11,106 @@ export type Database = {
         Tables: {
             mock_assets: {
                 Row: {
-                    esg_score: number
-                    expected_return: number
-                    liquidity_score: number
-                    name: string
-                    sector: string
+                    id: string
+                    user_id: string
                     symbol: string
-                    volatility: number
-                }
-                Insert: {
-                    esg_score: number
-                    expected_return: number
-                    liquidity_score: number
-                    name: string
-                    sector: string
-                    symbol: string
-                    volatility: number
-                }
-                Update: {
+                    quantity: number
+                    purchase_price: number
+                    purchase_date: string
+                    name?: string
+                    sector?: string
                     esg_score?: number
                     expected_return?: number
                     liquidity_score?: number
+                    volatility?: number
+                }
+                Insert: {
+                    id?: string
+                    user_id: string
+                    symbol: string
+                    quantity: number
+                    purchase_price: number
+                    purchase_date?: string
                     name?: string
                     sector?: string
-                    symbol?: string
+                    esg_score?: number
+                    expected_return?: number
+                    liquidity_score?: number
                     volatility?: number
+                }
+                Update: {
+                    id?: string
+                    user_id?: string
+                    symbol?: string
+                    quantity?: number
+                    purchase_price?: number
+                    purchase_date?: string
+                    name?: string
+                    sector?: string
+                    esg_score?: number
+                    expected_return?: number
+                    liquidity_score?: number
+                    volatility?: number
+                }
+                Relationships: []
+            }
+            market_news: {
+                Row: {
+                    id: number
+                    external_id: string
+                    headline: string
+                    summary: string
+                    source: string
+                    url: string
+                    image_url: string
+                    published_at: string
+                    category: string
+                    created_at: string
+                }
+                Insert: {
+                    id?: number
+                    external_id: string
+                    headline: string
+                    summary: string
+                    source: string
+                    url: string
+                    image_url: string
+                    published_at: string
+                    category: string
+                    created_at?: string
+                }
+                Update: {
+                    id?: number
+                    external_id?: string
+                    headline?: string
+                    summary?: string
+                    source?: string
+                    url?: string
+                    image_url?: string
+                    published_at?: string
+                    category?: string
+                    created_at?: string
+                }
+                Relationships: []
+            }
+            portfolio_analyses: {
+                Row: {
+                    id: number
+                    user_id: string
+                    analysis_text: string
+                    analyzed_at: string
+                }
+                Insert: {
+                    id?: number
+                    user_id: string
+                    analysis_text: string
+                    analyzed_at?: string
+                }
+                Update: {
+                    id?: number
+                    user_id?: string
+                    analysis_text?: string
+                    analyzed_at?: string
                 }
                 Relationships: []
             }

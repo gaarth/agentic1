@@ -36,10 +36,10 @@ export class RiskAgent extends BaseAgent {
             },
             available_assets: assets.map(a => ({
                 symbol: a.symbol,
-                volatility: a.volatility,
-                expected_return: a.expected_return,
-                esg_score: a.esg_score,
-                sector: a.sector
+                volatility: a.volatility || 0,
+                expected_return: a.expected_return || 0,
+                esg_score: a.esg_score || 0,
+                sector: a.sector || 'Unknown'
             })),
             round: roundNumber,
             must_veto: isViolating
@@ -75,8 +75,8 @@ export class RiskAgent extends BaseAgent {
         Object.entries(allocation).forEach(([symbol, weight]) => {
             const asset = assets.find(a => a.symbol === symbol);
             if (asset && weight > 0) {
-                volatility += asset.volatility * weight;
-                expectedReturn += asset.expected_return * weight;
+                volatility += (asset.volatility || 0) * weight;
+                expectedReturn += (asset.expected_return || 0) * weight;
                 totalWeight += weight;
             }
         });

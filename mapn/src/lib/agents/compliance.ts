@@ -39,9 +39,9 @@ export class ComplianceAgent extends BaseAgent {
             excluded_allocations: excludedAllocations,
             available_assets: assets.map(a => ({
                 symbol: a.symbol,
-                esg_score: a.esg_score,
-                sector: a.sector,
-                is_excluded: sectorExclusions.some(s => a.sector.toLowerCase().includes(s.toLowerCase()))
+                esg_score: a.esg_score || 0,
+                sector: a.sector || 'Unknown',
+                is_excluded: sectorExclusions.some(s => (a.sector || '').toLowerCase().includes(s.toLowerCase()))
             })).sort((a, b) => b.esg_score - a.esg_score),
             round: roundNumber,
             must_veto: isViolating || excludedAllocations.length > 0
@@ -80,7 +80,7 @@ export class ComplianceAgent extends BaseAgent {
         Object.entries(allocation).forEach(([symbol, weight]) => {
             const asset = assets.find(a => a.symbol === symbol);
             if (asset && weight > 0) {
-                esgScore += asset.esg_score * weight;
+                esgScore += (asset.esg_score || 0) * weight;
                 totalWeight += weight;
             }
         });
@@ -102,11 +102,12 @@ export class ComplianceAgent extends BaseAgent {
             if (weight <= 0) return;
             const asset = assets.find(a => a.symbol === symbol);
             if (asset) {
+                const sector = asset.sector || '';
                 const isExcluded = exclusions.some(
-                    exc => asset.sector.toLowerCase().includes(exc.toLowerCase())
+                    exc => sector.toLowerCase().includes(exc.toLowerCase())
                 );
                 if (isExcluded) {
-                    violations.push({ symbol, sector: asset.sector, weight });
+                    violations.push({ symbol, sector, weight });
                 }
             }
         });

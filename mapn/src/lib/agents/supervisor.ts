@@ -61,11 +61,11 @@ export class SupervisorAgent {
             veto_info: vetoInfo,
             assets: assets.map(a => ({
                 symbol: a.symbol,
-                sector: a.sector,
-                volatility: a.volatility,
-                expected_return: a.expected_return,
-                esg_score: a.esg_score,
-                liquidity_score: a.liquidity_score
+                sector: a.sector || 'Unknown',
+                volatility: a.volatility || 0,
+                expected_return: a.expected_return || 0,
+                esg_score: a.esg_score || 0,
+                liquidity_score: a.liquidity_score || 0
             }))
         }, null, 2);
 
@@ -179,9 +179,9 @@ export class SupervisorAgent {
         Object.entries(allocation).forEach(([symbol, weight]) => {
             const asset = assets.find(a => a.symbol === symbol);
             if (asset && weight > 0) {
-                expectedReturn += asset.expected_return * weight;
-                volatility += asset.volatility * weight;
-                esgScore += asset.esg_score * weight;
+                expectedReturn += (asset.expected_return || 0) * weight;
+                volatility += (asset.volatility || 0) * weight;
+                esgScore += (asset.esg_score || 0) * weight;
                 totalWeight += weight;
             }
         });
@@ -203,7 +203,7 @@ export class SupervisorAgent {
         // Sort assets by a balanced score: high return, low volatility, high ESG
         const scoredAssets = assets.map(a => ({
             symbol: a.symbol,
-            score: (a.expected_return / 30) - (a.volatility / constraints.max_volatility) + (a.esg_score / 100)
+            score: ((a.expected_return || 0) / 30) - ((a.volatility || 0) / constraints.max_volatility) + ((a.esg_score || 0) / 100)
         })).sort((a, b) => b.score - a.score);
 
         // Create a new allocation favoring better-scored assets
