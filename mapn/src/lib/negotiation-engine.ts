@@ -4,7 +4,32 @@ import { RiskAgent } from './agents/risk';
 import { GrowthAgent } from './agents/growth';
 import { ComplianceAgent } from './agents/compliance';
 import { LiquidityAgent } from './agents/liquidity';
-import { SupervisorAgent } from './agents/supervisor';
+import { SupervisorAgent, SupervisorSynthesisResult } from './agents/supervisor';
+
+export interface EnhancedNegotiationRound extends NegotiationRound {
+    agentReasoning: {
+        risk: string;
+        growth: string;
+        compliance: string;
+        liquidity: string;
+    };
+    metrics: {
+        expectedReturn: number;
+        volatility: number;
+        esgScore: number;
+    };
+    targetComparison: {
+        returnTarget: number;
+        returnActual: number;
+        returnMet: boolean;
+        volatilityTarget: number;
+        volatilityActual: number;
+        volatilityMet: boolean;
+        esgTarget: number;
+        esgActual: number;
+        esgMet: boolean;
+    };
+}
 
 export class NegotiationEngine {
     private assets: MockAsset[] = [];
@@ -47,9 +72,6 @@ export class NegotiationEngine {
 
         if (error || !neg) throw new Error('Failed to create negotiation record');
 
-        // 2. Run the Loop (in background or awaited? Plan implies streaming, so maybe we yield results?)
-        // For the MVP, we might run it and update the DB step-by-step.
-
         return neg.id;
     }
 
@@ -59,9 +81,9 @@ export class NegotiationEngine {
         roundNumber: number,
         constraints: NegotiationInputParams,
         previousRounds: NegotiationRound[]
-    ): Promise<NegotiationRound> {
+    ): Promise<EnhancedNegotiationRound> {
 
-        // Conservative Delay for API Rate Limits (per user request)
+        // Conservative Delay for API Rate Limits
         if (roundNumber > 1) {
             const delay = 4000; // 4 seconds delay between rounds
             await new Promise(resolve => setTimeout(resolve, delay));
@@ -83,7 +105,7 @@ export class NegotiationEngine {
         };
 
         // 2. Supervisor Synthesis
-        const result = await this.supervisor.synthesize(
+        const result: SupervisorSynthesisResult = await this.supervisor.synthesize(
             currentAllocation,
             this.assets,
             bids,
@@ -91,8 +113,8 @@ export class NegotiationEngine {
             roundNumber
         );
 
-        // 3. Construct Round Object
-        const round: NegotiationRound = {
+        // 3. Construct Enhanced Round Object
+        const round: EnhancedNegotiationRound = {
             round_number: roundNumber,
             agent_bids: {
                 risk: riskBid,
@@ -101,18 +123,16 @@ export class NegotiationEngine {
                 liquidity: liquidityBid
             },
             proposed_allocation: result.allocation,
-            consensus_reached: result.consensus
+            consensus_reached: result.consensus,
+            agentReasoning: result.agentReasoning,
+            metrics: result.metrics,
+            targetComparison: result.targetComparison
         };
 
         // 4. Persist Round
-        // (Optimization: In prod, use an RPC for atomic append, but for MVP we overwrite the array)
-
-        // NOTE: We need to recreate the update logic since 'rounds_log' is an array.
-        // Standard update:
         const { error } = await supabase
             .from('negotiations')
             .update({
-                // accepted loose typing here for demo speed, ideally strictly typed
                 // @ts-ignore 
                 rounds_log: [...previousRounds, round] as any,
                 final_allocation: result.consensus ? result.allocation as any : undefined,
@@ -125,3 +145,4 @@ export class NegotiationEngine {
         return round;
     }
 }
+

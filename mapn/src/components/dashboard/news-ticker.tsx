@@ -33,21 +33,26 @@ export function NewsTicker() {
 
     return (
         <div className="w-full bg-secondary/20 border-y border-border/30 overflow-hidden py-2 flex items-center relative">
-            <div className="absolute left-0 z-10 pl-4 pr-2 bg-background/5 text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                <Newspaper className="w-3 h-3" />
-                Latest
+            {/* Label with solid background and gradient fade */}
+            <div className="absolute left-0 z-10 flex items-center h-full">
+                <div className="pl-4 pr-3 py-1 bg-background text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                    <Newspaper className="w-3 h-3" />
+                    Latest
+                </div>
+                {/* Gradient fade to hide text sliding under */}
+                <div className="w-8 h-full bg-gradient-to-r from-background to-transparent" />
             </div>
 
             <motion.div
-                className="flex gap-8 items-center whitespace-nowrap pl-24"
+                className="flex gap-8 items-center whitespace-nowrap pl-32"
                 animate={{ x: [0, -1000] }}
                 transition={{
                     repeat: Infinity,
                     ease: "linear",
-                    duration: 30, // Adjust speed based on content length
+                    duration: 30,
                 }}
             >
-                {[...news, ...news].map((item, i) => ( // Duplicate for seamless loop
+                {[...news, ...news].map((item, i) => (
                     <a
                         key={`${item.id}-${i}`}
                         href={item.url}
