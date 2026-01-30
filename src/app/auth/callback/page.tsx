@@ -1,63 +1,42 @@
-'use client'
+"use client";
 
-import { useEffect, Suspense } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
-
-function CallbackContent() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-
-  useEffect(() => {
-    const handleAuthCallback = async () => {
-      const code = searchParams.get('code')
-      // Default to /dashboard, but allow 'next' param if present
-      const next = searchParams.get('next') ?? '/dashboard'
-      
-      const supabase = createClient()
-
-      if (code) {
-        const { error } = await supabase.auth.exchangeCodeForSession(code)
-        
-        if (!error) {
-          // Use window.location.origin to handle the redirect dynamically
-          // This ensures a full page load which is often safer for auth state synchronization
-          window.location.href = `${window.location.origin}${next}`
-        } else {
-          console.error('Auth error:', error)
-          // On error, redirect to login or error page
-          router.push('/login?error=auth_code_error')
-        }
-      } else {
-         // Check if session already exists (e.g. implicit flow or already logged in)
-         const { data: { session }, error } = await supabase.auth.getSession()
-         
-         if (session) {
-             window.location.href = `${window.location.origin}${next}`
-         } else {
-             // If no code and no session, redirect to login
-             router.push('/login')
-         }
-      }
-    }
-
-    handleAuthCallback()
-  }, [searchParams, router])
-
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h2 className="mb-4 text-xl font-semibold">Authenticating...</h2>
-        <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-      </div>
-    </div>
-  )
-}
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/utils/supabase/client";
 
 export default function AuthCallbackPage() {
+  const router = useRouter();
+  const supabase = createClient();
+
+  useEffect(() => {
+    // Check for session via subscription to handle async auth state changes
+    // This catches both 'INITIAL_SESSION' (if already valid) and 'SIGNED_IN' (after exchange)
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event: string, session: any) => {
+      if (event === "SIGNED_OUT") {
+        // handle sign out if necessary, or do nothing and let the user stay here/redirect to login
+        router.push("/login");
+      } else if (session) {
+        router.push("/dashboard");
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [router, supabase]);
+
   return (
-    <Suspense fallback={<div className="flex min-h-screen items-center justify-center">Loading...</div>}>
-      <CallbackContent />
-    </Suspense>
-  )
+    <div className="flex min-h-screen items-center justify-center bg-gray-50">
+      <div className="text-center">
+        <h2 className="mb-2 text-xl font-semibold text-gray-900">Authenticating...</h2>
+        <p className="text-gray-500">Please wait while we log you in.</p>
+        {/* Simple loading spinner */}
+        <div className="mt-4 flex justify-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600"></div>
+        </div>
+      </div>
+    </div>
+  );
 }
