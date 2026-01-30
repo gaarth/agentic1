@@ -379,3 +379,76 @@
     padding: 64px 24px;
   }
 }
+
+/* Premium Smooth Slider Styles */
+.smooth-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  background: linear-gradient(to right, var(--primary) 0%, var(--primary) var(--slider-progress, 50%), var(--secondary) var(--slider-progress, 50%), var(--secondary) 100%);
+  border-radius: 999px;
+  outline: none;
+  cursor: pointer;
+  transition: background 0.1s ease;
+}
+
+.smooth-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-gradient-start) 100%);
+  border-radius: 50%;
+  cursor: grab;
+  box-shadow: 0 4px 12px rgba(129, 74, 200, 0.4), 0 0 0 4px rgba(129, 74, 200, 0.1);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.smooth-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 6px 20px rgba(129, 74, 200, 0.5), 0 0 0 6px rgba(129, 74, 200, 0.15);
+}
+
+.smooth-slider::-webkit-slider-thumb:active {
+  cursor: grabbing;
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(129, 74, 200, 0.6), 0 0 0 8px rgba(129, 74, 200, 0.2);
+}
+
+.smooth-slider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-gradient-start) 100%);
+  border: none;
+  border-radius: 50%;
+  cursor: grab;
+  box-shadow: 0 4px 12px rgba(129, 74, 200, 0.4), 0 0 0 4px rgba(129, 74, 200, 0.1);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.smooth-slider::-moz-range-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 6px 20px rgba(129, 74, 200, 0.5), 0 0 0 6px rgba(129, 74, 200, 0.15);
+}
+
+.smooth-slider::-moz-range-track {
+  height: 8px;
+  background: var(--secondary);
+  border-radius: 999px;
+}
+
+.smooth-slider::-moz-range-progress {
+  height: 8px;
+  background: var(--primary);
+  border-radius: 999px;
+}
+
+/* Focus styles */
+.smooth-slider:focus-visible {
+  outline: none;
+}
+
+.smooth-slider:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 4px 12px rgba(129, 74, 200, 0.4), 0 0 0 4px rgba(129, 74, 200, 0.3);
+}

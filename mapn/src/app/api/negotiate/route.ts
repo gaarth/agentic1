@@ -1,21 +1,86 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
-import { NegotiationEngine } from '@/lib/negotiation-engine';
-import { NegotiationInputParams, NegotiationRound } from '@/lib/database.types';
+import { NegotiationEngine, EnhancedNegotiationRound } from '@/lib/negotiation-engine';
+import { NegotiationInputParams, NegotiationRound, UserSurveyResponse } from '@/lib/database.types';
+import { convertToINR, SupportedCurrency } from '@/lib/currency-api';
 
-export const runtime = 'edge'; // Use Edge Runtime for better streaming performance if possible, though 'nodejs' might be safer for Supabase if not using edge-compat client. Let's try edge.
-// actually, standard supabase-js works in edge.
+export const runtime = 'edge';
+
+// Translate survey responses to concrete negotiation constraints
+function translateSurveyToConstraints(survey: UserSurveyResponse, capitalINR: number): {
+    max_volatility: number;
+    esg_minimum: number;
+    target_expected_return: number;
+} {
+    // Risk tolerance -> Volatility limits
+    const volatilityMap = {
+        conservative: 10,
+        balanced: 18,
+        aggressive: 28
+    };
+
+    // Risk tolerance + Expected return range -> Target return
+    const returnMap = {
+        conservative: { base: 8, max: 12 },
+        balanced: { base: 12, max: 18 },
+        aggressive: { base: 18, max: 30 }
+    };
+
+    // Downside comfort affects volatility adjustment
+    const downsideAdjustment = {
+        low: -3,
+        medium: 0,
+        high: 3
+    };
+
+    // ESG based on sector exclusions and tax sensitivity
+    let esg_minimum = 50; // Base ESG
+    if (survey.sectorExclusions.length > 0) {
+        esg_minimum = Math.max(esg_minimum, 65);
+    }
+    if (survey.taxSensitivity === 'high') {
+        esg_minimum = Math.max(esg_minimum, 60);
+    }
+
+    // Calculate final values
+    const max_volatility = Math.max(5, volatilityMap[survey.riskTolerance] + downsideAdjustment[survey.downsideComfort]);
+
+    // Use user's expected return range if provided, otherwise use profile default
+    const target_expected_return = survey.expectedReturnRange?.min
+        ? (survey.expectedReturnRange.min + survey.expectedReturnRange.max) / 2
+        : returnMap[survey.riskTolerance].base;
+
+    return {
+        max_volatility,
+        esg_minimum,
+        target_expected_return
+    };
+}
 
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
-        const { capital, max_volatility, esg_minimum, custom_constraints } = body;
+        const {
+            capital,
+            currency = 'INR',
+            surveyResponse
+        } = body;
+
+        // Convert capital to INR for consistent calculations
+        const capitalINR = await convertToINR(capital, currency as SupportedCurrency);
+
+        // Translate survey to constraints
+        const surveyConstraints = surveyResponse
+            ? translateSurveyToConstraints(surveyResponse, capitalINR)
+            : { max_volatility: 15, esg_minimum: 50, target_expected_return: 12 };
 
         const constraints: NegotiationInputParams = {
-            capital,
-            max_volatility: max_volatility || 15,
-            esg_minimum: esg_minimum || 0,
-            custom_constraints
+            capital: capitalINR,
+            currency,
+            max_volatility: surveyConstraints.max_volatility,
+            esg_minimum: surveyConstraints.esg_minimum,
+            target_expected_return: surveyConstraints.target_expected_return,
+            surveyResponse
         };
 
         // 1. Fetch Assets
@@ -31,7 +96,6 @@ export async function POST(req: NextRequest) {
         const engine = new NegotiationEngine(assets);
 
         // 3. Start Negotiation (DB Record)
-        // Note: We await this to get the ID, but the heavy lifting happens in the stream
         const negotiationId = await engine.startNegotiation(constraints);
 
         // 4. Create Stream
@@ -44,20 +108,29 @@ export async function POST(req: NextRequest) {
                 };
 
                 try {
-                    // Send initial state & asset metadata
+                    // Send initial state & asset metadata with constraints
                     let currentAllocation = engine.getInitialPortfolio();
                     send({
                         type: 'init',
                         negotiationId,
                         initialAllocation: currentAllocation,
-                        assets: assets // Send asset definitions so frontend can calculate metrics
+                        assets,
+                        constraints: {
+                            max_volatility: constraints.max_volatility,
+                            esg_minimum: constraints.esg_minimum,
+                            target_expected_return: constraints.target_expected_return,
+                            capital: capitalINR,
+                            currency
+                        },
+                        surveyResponse
                     });
 
                     const roundsLog: NegotiationRound[] = [];
+                    const allRoundsData: EnhancedNegotiationRound[] = [];
 
-                    // Run up to 3 rounds
-                    for (let i = 1; i <= 3; i++) {
-                        // Processing message
+                    // Run up to 5 rounds for better convergence
+                    const maxRounds = 5;
+                    for (let i = 1; i <= maxRounds; i++) {
                         send({ type: 'status', message: `Starting Round ${i}...` });
 
                         const roundResult = await engine.runRound(
@@ -69,9 +142,18 @@ export async function POST(req: NextRequest) {
                         );
 
                         roundsLog.push(roundResult);
+                        allRoundsData.push(roundResult);
                         currentAllocation = roundResult.proposed_allocation;
 
-                        send({ type: 'round', data: roundResult });
+                        // Send enhanced round data including agent reasoning
+                        send({
+                            type: 'round',
+                            data: roundResult,
+                            roundNumber: i,
+                            metrics: roundResult.metrics,
+                            targetComparison: roundResult.targetComparison,
+                            agentReasoning: roundResult.agentReasoning
+                        });
 
                         if (roundResult.consensus_reached) {
                             send({ type: 'status', message: 'Consensus reached!' });
@@ -79,7 +161,16 @@ export async function POST(req: NextRequest) {
                         }
                     }
 
-                    send({ type: 'done', finalAllocation: currentAllocation });
+                    // Send completion with full summary data
+                    send({
+                        type: 'done',
+                        finalAllocation: currentAllocation,
+                        allRounds: allRoundsData,
+                        finalMetrics: allRoundsData[allRoundsData.length - 1]?.metrics,
+                        targetComparison: allRoundsData[allRoundsData.length - 1]?.targetComparison,
+                        agentReasoning: allRoundsData[allRoundsData.length - 1]?.agentReasoning,
+                        constraints
+                    });
                     controller.close();
 
                 } catch (err) {
@@ -102,3 +193,4 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
+

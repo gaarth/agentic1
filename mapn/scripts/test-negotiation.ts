@@ -27,8 +27,10 @@ async function runTest() {
     // 3. Define User Constraints
     const constraints: NegotiationInputParams = {
         capital: 100000,
+        currency: 'INR',
         max_volatility: 12, // Conservative
         esg_minimum: 70,    // High Ethical Standard
+        target_expected_return: 12,
         custom_constraints: "Avoid crypto"
     };
     console.log('Constraints:', constraints);

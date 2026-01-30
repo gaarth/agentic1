@@ -1,0 +1,2 @@
+﻿scripts/test-negotiation.ts(28,11): error TS2739: Type '{ capital: number; max_volatility: number; esg_minimum: number; custom_constraints: string; }' is missing the following properties from type 'NegotiationInputParams': currency, target_expected_return
+src/components/views/dashboard-view.tsx(303,51): error TS2367: This comparison appears to be unintentional because the types '"idle"' and '"running"' have no overlap.
