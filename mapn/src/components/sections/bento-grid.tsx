@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion"
 import { Bot, Zap, Brain, Network } from "lucide-react"
+import { GlowingEffect } from "@/components/ui/glowing-effect"
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -59,7 +60,15 @@ export function BentoGrid() {
                         variants={itemVariants}
                         className="md:col-span-2 p-8 rounded-2xl glass-panel overflow-hidden relative group"
                     >
-                        <div className="flex flex-col md:flex-row items-start md:items-center gap-8">
+                        <GlowingEffect
+                            spread={40}
+                            glow={true}
+                            disabled={false}
+                            proximity={64}
+                            inactiveZone={0.01}
+                            borderWidth={3}
+                        />
+                        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center gap-8">
                             <div className="flex-1">
                                 <div className="w-12 h-12 rounded-xl bg-gradient-primary flex items-center justify-center mb-4">
                                     <Network className="w-6 h-6 text-white" />
@@ -88,29 +97,49 @@ export function BentoGrid() {
                     {/* Card - Real-time Processing */}
                     <motion.div
                         variants={itemVariants}
-                        className="p-8 rounded-2xl glass-panel"
+                        className="p-8 rounded-2xl glass-panel relative overflow-hidden"
                     >
-                        <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center mb-4">
-                            <Zap className="w-6 h-6 text-blue-400" />
+                        <GlowingEffect
+                            spread={40}
+                            glow={true}
+                            disabled={false}
+                            proximity={64}
+                            inactiveZone={0.01}
+                            borderWidth={3}
+                        />
+                        <div className="relative z-10">
+                            <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center mb-4">
+                                <Zap className="w-6 h-6 text-blue-400" />
+                            </div>
+                            <h3 className="text-xl font-semibold mb-3">Real-time Processing</h3>
+                            <p className="text-muted-foreground leading-relaxed">
+                                Agents evaluate and respond within milliseconds, enabling rapid iteration and decision-making.
+                            </p>
                         </div>
-                        <h3 className="text-xl font-semibold mb-3">Real-time Processing</h3>
-                        <p className="text-muted-foreground leading-relaxed">
-                            Agents evaluate and respond within milliseconds, enabling rapid iteration and decision-making.
-                        </p>
                     </motion.div>
 
                     {/* Card - Consensus Engine */}
                     <motion.div
                         variants={itemVariants}
-                        className="p-8 rounded-2xl glass-panel"
+                        className="p-8 rounded-2xl glass-panel relative overflow-hidden"
                     >
-                        <div className="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center mb-4">
-                            <Brain className="w-6 h-6 text-green-400" />
+                        <GlowingEffect
+                            spread={40}
+                            glow={true}
+                            disabled={false}
+                            proximity={64}
+                            inactiveZone={0.01}
+                            borderWidth={3}
+                        />
+                        <div className="relative z-10">
+                            <div className="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center mb-4">
+                                <Brain className="w-6 h-6 text-green-400" />
+                            </div>
+                            <h3 className="text-xl font-semibold mb-3">Consensus Engine</h3>
+                            <p className="text-muted-foreground leading-relaxed">
+                                A supervisor agent synthesizes input from all agents to produce balanced, well-reasoned outcomes.
+                            </p>
                         </div>
-                        <h3 className="text-xl font-semibold mb-3">Consensus Engine</h3>
-                        <p className="text-muted-foreground leading-relaxed">
-                            A supervisor agent synthesizes input from all agents to produce balanced, well-reasoned outcomes.
-                        </p>
                     </motion.div>
                 </motion.div>
             </div>

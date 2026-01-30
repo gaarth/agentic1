@@ -5,6 +5,7 @@ import { LogosBar } from "@/components/sections/logos-bar";
 import { FeaturesSection } from "@/components/sections/features-section";
 import { BentoGrid } from "@/components/sections/bento-grid";
 import { ServicesSection } from "@/components/sections/services-section";
+import { PricingSection } from "@/components/sections/pricing-section";
 import { FAQSection } from "@/components/sections/faq-section";
 import { CTASection } from "@/components/sections/cta-section";
 
@@ -18,6 +19,7 @@ export default function Home() {
         <FeaturesSection />
         <BentoGrid />
         <ServicesSection />
+        <PricingSection />
         <FAQSection />
         <CTASection />
       </main>
@@ -25,4 +27,3 @@ export default function Home() {
     </>
   );
 }
-
