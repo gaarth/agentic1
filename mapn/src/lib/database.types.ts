@@ -47,6 +47,7 @@ export type Database = {
                     id: string
                     input_params: Json
                     rounds_log: Json[] | null
+                    user_id: string | null
                 }
                 Insert: {
                     created_at?: string | null
@@ -55,6 +56,7 @@ export type Database = {
                     id?: string
                     input_params: Json
                     rounds_log?: Json[] | null
+                    user_id?: string | null
                 }
                 Update: {
                     created_at?: string | null
@@ -63,8 +65,16 @@ export type Database = {
                     id?: string
                     input_params?: Json
                     rounds_log?: Json[] | null
+                    user_id?: string | null
                 }
-                Relationships: []
+                Relationships: [
+                    {
+                        foreignKeyName: "negotiations_user_id_fkey"
+                        columns: ["user_id"]
+                        referencedRelation: "users"
+                        referencedColumns: ["id"]
+                    }
+                ]
             }
         }
         Views: {

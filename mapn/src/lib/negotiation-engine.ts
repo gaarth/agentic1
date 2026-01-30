@@ -58,7 +58,7 @@ export class NegotiationEngine {
         return portfolio;
     }
 
-    async startNegotiation(constraints: NegotiationInputParams) {
+    async startNegotiation(constraints: NegotiationInputParams, userId?: string) {
         // 1. Create Negotiation Record in DB
         const { data: neg, error } = await supabase
             .from('negotiations')
@@ -66,6 +66,7 @@ export class NegotiationEngine {
                 input_params: constraints as any,
                 rounds_log: [],
                 final_allocation: {},
+                user_id: userId
             })
             .select()
             .single();

@@ -59,6 +59,19 @@ function translateSurveyToConstraints(survey: UserSurveyResponse, capitalINR: nu
 
 export async function POST(req: NextRequest) {
     try {
+        // Verify Authentication
+        const authHeader = req.headers.get('Authorization');
+        if (!authHeader) {
+            return NextResponse.json({ error: 'Missing Authorization header' }, { status: 401 });
+        }
+
+        const token = authHeader.replace('Bearer ', '');
+        const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+        if (authError || !user) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
         const body = await req.json();
         const {
             capital,
@@ -95,8 +108,8 @@ export async function POST(req: NextRequest) {
         // 2. Initialize Engine
         const engine = new NegotiationEngine(assets);
 
-        // 3. Start Negotiation (DB Record)
-        const negotiationId = await engine.startNegotiation(constraints);
+        // 3. Start Negotiation (DB Record) with User ID
+        const negotiationId = await engine.startNegotiation(constraints, user.id);
 
         // 4. Create Stream
         const stream = new ReadableStream({

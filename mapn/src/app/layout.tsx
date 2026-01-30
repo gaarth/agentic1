@@ -6,6 +6,7 @@ import { SmoothScroll } from "@/components/providers/smooth-scroll";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { CurrencyProvider } from "@/components/providers/currency-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { AuthProvider } from "@/components/providers/auth-provider";
 
 const figtree = Figtree({
   variable: "--font-figtree",
@@ -39,8 +40,10 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <CurrencyProvider>
-            <SmoothScroll>{children}</SmoothScroll>
-            <Toaster />
+            <AuthProvider>
+              <SmoothScroll>{children}</SmoothScroll>
+              <Toaster />
+            </AuthProvider>
           </CurrencyProvider>
         </ThemeProvider>
       </body>

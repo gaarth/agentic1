@@ -19,6 +19,7 @@ import { QuantitativeProjections } from '@/components/ui/quantitative-projection
 import { UserSurveyResponse } from '@/lib/database.types';
 import { SupportedCurrency } from '@/lib/currency-api';
 import { EnhancedNegotiationRound } from '@/lib/negotiation-engine';
+import { useAuth } from '@/components/providers/auth-provider';
 
 // Types derived from backend
 interface Asset {
@@ -127,7 +128,11 @@ export function DashboardView() {
         setShowSurveyModal(true);
     };
 
+    const { session } = useAuth(); // Get session from auth context
+
     const startNegotiation = async (survey: UserSurveyResponse | null = surveyResponse) => {
+        if (!session) return; // Should not happen due to route protection
+
         setStatus('running');
         setAllocation({});
         setNegotiationRounds([]);
@@ -138,7 +143,10 @@ export function DashboardView() {
         try {
             const res = await fetch('/api/negotiate', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.access_token}`
+                },
                 body: JSON.stringify({
                     capital,
                     currency,
