@@ -25,12 +25,16 @@ import {
     MessageSquare,
     Info,
     X,
-    Search
+    Search,
+    User,
+    LogOut
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useAuth } from "@/components/providers/auth-provider"
 
 const sections = [
     { id: 'appearance', label: 'Appearance', icon: Palette },
+    { id: 'account', label: 'Profile & Account', icon: User },
     { id: 'security', label: 'Security', icon: Shield },
     { id: 'privacy', label: 'Privacy', icon: Eye },
     { id: 'notifications', label: 'Notifications', icon: Bell },
@@ -50,14 +54,22 @@ interface SettingsDropdownProps {
     isOpen: boolean
     onClose: () => void
     triggerRef: React.RefObject<HTMLButtonElement | null>
+    defaultSection?: string
 }
 
-export function SettingsDropdown({ isOpen, onClose, triggerRef }: SettingsDropdownProps) {
-    const [activeSection, setActiveSection] = React.useState('appearance')
+export function SettingsDropdown({ isOpen, onClose, triggerRef, defaultSection = 'appearance' }: SettingsDropdownProps) {
+    const [activeSection, setActiveSection] = React.useState(defaultSection)
     const { theme, setTheme } = useTheme()
     const { currency, setCurrency, dateFormat, setDateFormat } = useCurrency()
+    const { user, signOut } = useAuth()
     const dropdownRef = React.useRef<HTMLDivElement>(null)
     const [currencySearch, setCurrencySearch] = React.useState("")
+
+    React.useEffect(() => {
+        if (isOpen && defaultSection) {
+            setActiveSection(defaultSection)
+        }
+    }, [isOpen, defaultSection])
 
     React.useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -159,6 +171,51 @@ export function SettingsDropdown({ isOpen, onClose, triggerRef }: SettingsDropdo
                                             )}
                                         </button>
                                     ))}
+                                </div>
+                            )}
+
+                            {activeSection === 'account' && (
+                                <div className="space-y-6">
+                                    <div className="flex items-center gap-4 p-4 rounded-xl bg-primary/5 border border-primary/20 mb-2">
+                                        <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+                                            <User className="w-6 h-6" />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <p className="font-medium text-foreground">{user?.email || 'Guest User'}</p>
+                                            <p className="text-xs text-muted-foreground">Personal Account</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-4">
+                                        <div className="space-y-2">
+                                            <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Account Details</h4>
+
+                                            <div className="flex items-center justify-between p-3 rounded-lg border border-border bg-card">
+                                                <div className="space-y-0.5">
+                                                    <label className="text-xs text-muted-foreground">Email</label>
+                                                    <p className="text-sm font-medium">{user?.email || 'No email linked'}</p>
+                                                </div>
+                                                <div className="px-2 py-0.5 rounded-full bg-green-500/10 text-green-500 text-[10px] font-medium border border-green-500/20">
+                                                    Verified
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-center justify-between p-3 rounded-lg border border-border bg-card">
+                                                <div className="space-y-0.5">
+                                                    <label className="text-xs text-muted-foreground">Password</label>
+                                                    <p className="text-sm font-mono">••••••••••••</p>
+                                                </div>
+                                                <button className="text-xs text-primary hover:underline">Change</button>
+                                            </div>
+                                        </div>
+
+                                        <SettingsItem
+                                            icon={LogOut}
+                                            label="Sign Out"
+                                            variant="destructive"
+                                            onClick={signOut}
+                                        />
+                                    </div>
                                 </div>
                             )}
 
@@ -285,12 +342,14 @@ function SettingsItem({
     label,
     badge,
     toggle,
+    variant,
     onClick
 }: {
     icon: any,
     label: string,
     badge?: string,
     toggle?: boolean,
+    variant?: 'default' | 'destructive'
     onClick?: () => void
 }) {
     const [isEnabled, setIsEnabled] = React.useState(false)
@@ -313,8 +372,14 @@ function SettingsItem({
             className="flex items-center justify-between p-3 rounded-lg bg-secondary/5 border border-border hover:bg-secondary/10 transition-all cursor-pointer group select-none"
         >
             <div className="flex items-center gap-3">
-                <Icon className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                <span className="text-sm font-medium">{label}</span>
+                <Icon className={cn(
+                    "w-4 h-4 transition-colors",
+                    variant === 'destructive' ? "text-destructive" : "text-muted-foreground group-hover:text-primary"
+                )} />
+                <span className={cn(
+                    "text-sm font-medium",
+                    variant === 'destructive' ? "text-destructive" : ""
+                )}>{label}</span>
             </div>
             <div className="flex items-center gap-2">
                 {badge && <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground">{badge}</span>}
