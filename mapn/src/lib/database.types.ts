@@ -88,12 +88,38 @@ export type MockAssetInsert = Database['public']['Tables']['mock_assets']['Inser
 export type Negotiation = Database['public']['Tables']['negotiations']['Row']
 export type NegotiationInsert = Database['public']['Tables']['negotiations']['Insert']
 
+// User survey response types
+export type RiskTolerance = 'conservative' | 'balanced' | 'aggressive';
+export type InvestmentHorizon = 'short' | 'medium' | 'long';
+export type DownsideComfort = 'low' | 'medium' | 'high';
+export type IncomeNeeds = 'none' | 'some' | 'regular';
+export type TaxSensitivity = 'low' | 'medium' | 'high';
+export type GeographicPreference = 'domestic' | 'international' | 'global';
+export type RebalancingFrequency = 'monthly' | 'quarterly' | 'annually';
+export type AssetClass = 'equities' | 'debt' | 'crypto' | 'alternatives';
+
+export interface UserSurveyResponse {
+    riskTolerance: RiskTolerance;
+    expectedReturnRange: { min: number; max: number };
+    assetClasses: AssetClass[];
+    investmentHorizon: InvestmentHorizon;
+    downsideComfort: DownsideComfort;
+    incomeNeeds: IncomeNeeds;
+    taxSensitivity: TaxSensitivity;
+    geographicPreference: GeographicPreference;
+    rebalancingFrequency: RebalancingFrequency;
+    sectorExclusions: string[];
+}
+
 // Typed input params for negotiations
 export interface NegotiationInputParams {
-    capital: number
-    max_volatility: number
-    esg_minimum: number
-    custom_constraints?: string
+    capital: number;
+    currency: string;
+    max_volatility: number;
+    esg_minimum: number;
+    target_expected_return: number;
+    custom_constraints?: string;
+    surveyResponse?: UserSurveyResponse;
 }
 
 // Typed agent bid structure
