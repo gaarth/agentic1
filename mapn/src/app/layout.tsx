@@ -5,6 +5,7 @@ import "./globals.css";
 import { SmoothScroll } from "@/components/providers/smooth-scroll";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { CurrencyProvider } from "@/components/providers/currency-provider";
+import { AuthProvider } from "@/components/providers/auth-provider";
 import { Toaster } from "@/components/ui/sonner";
 
 const figtree = Figtree({
@@ -38,13 +39,14 @@ export default function RootLayout({
           themes={["theme-blacked", "theme-stoned", "theme-light-pro", "theme-midnight", "theme-slate", "light", "dark"]}
           disableTransitionOnChange
         >
-          <CurrencyProvider>
-            <SmoothScroll>{children}</SmoothScroll>
-            <Toaster />
-          </CurrencyProvider>
+          <AuthProvider>
+            <CurrencyProvider>
+              <SmoothScroll>{children}</SmoothScroll>
+              <Toaster />
+            </CurrencyProvider>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>
   );
 }
-
