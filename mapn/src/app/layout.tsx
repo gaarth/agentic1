@@ -4,6 +4,8 @@ import "./globals.css";
 
 import { SmoothScroll } from "@/components/providers/smooth-scroll";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { CurrencyProvider } from "@/components/providers/currency-provider";
+import { Toaster } from "@/components/ui/sonner";
 
 const figtree = Figtree({
   variable: "--font-figtree",
@@ -31,11 +33,15 @@ export default function RootLayout({
       <body className={`${figtree.variable} font-sans antialiased`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
+          defaultTheme="theme-blacked"
           enableSystem={false}
+          themes={["theme-blacked", "theme-stoned", "theme-light-pro", "theme-midnight", "theme-slate", "light", "dark"]}
           disableTransitionOnChange
         >
-          <SmoothScroll>{children}</SmoothScroll>
+          <CurrencyProvider>
+            <SmoothScroll>{children}</SmoothScroll>
+            <Toaster />
+          </CurrencyProvider>
         </ThemeProvider>
       </body>
     </html>

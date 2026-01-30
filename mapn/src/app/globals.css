@@ -51,10 +51,11 @@
   --color-primary-gradient-end: var(--primary-gradient-end);
 }
 
-:root {
+:root,
+.theme-blacked {
   --radius: 1rem;
 
-  /* MACANE Dark-First Design - Purple/Magenta palette */
+  /* Classic Blacked - High Contrast Dark */
   --background: #000000;
   --foreground: #ffffff;
   --card: rgba(13, 13, 13, 0.8);
@@ -62,12 +63,9 @@
   --popover: #0d0d0d;
   --popover-foreground: #ffffff;
   --primary: rgb(129, 74, 200);
-  /* Purple - from textfile_design */
   --primary-foreground: #ffffff;
   --primary-gradient-start: rgb(223, 122, 254);
-  /* Magenta */
   --primary-gradient-end: rgb(129, 74, 200);
-  /* Purple */
   --secondary: #222222;
   --secondary-foreground: #ffffff;
   --muted: rgba(255, 255, 255, 0.05);
@@ -96,8 +94,41 @@
   --sidebar-ring: rgb(129, 74, 200);
 }
 
-/* MACANE uses dark mode by default, but support light mode override */
+.theme-stoned {
+  --radius: 1rem;
+
+  /* Stoned Grey - Neutral Grey */
+  --background: #1c1c1c;
+  --foreground: #e5e7eb;
+  --card: rgba(35, 35, 35, 0.9);
+  --card-foreground: #e5e7eb;
+  --popover: #1c1c1c;
+  --popover-foreground: #e5e7eb;
+  --primary: #8b5cf6;
+  --primary-foreground: #ffffff;
+  --primary-gradient-start: #a78bfa;
+  --primary-gradient-end: #8b5cf6;
+  --secondary: #334155;
+  --secondary-foreground: #f8fafc;
+  --muted: rgba(255, 255, 255, 0.03);
+  --muted-foreground: #94a3b8;
+  --accent: rgba(139, 92, 246, 0.1);
+  --accent-foreground: #a78bfa;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: #334155;
+  --input: #334155;
+  --ring: #8b5cf6;
+
+  --sidebar: #1c1c1c;
+  --sidebar-foreground: #e5e7eb;
+}
+
+.theme-light-pro,
 .light {
+  --radius: 1rem;
+
+  /* Light Professional */
   --background: #F9FAFB;
   --foreground: #111827;
   --card: rgba(255, 255, 255, 0.8);
@@ -106,6 +137,8 @@
   --popover-foreground: #111827;
   --primary: rgb(129, 74, 200);
   --primary-foreground: #ffffff;
+  --primary-gradient-start: rgb(129, 74, 200);
+  --primary-gradient-end: rgb(107, 33, 168);
   --secondary: #64748b;
   --secondary-foreground: #ffffff;
   --muted: #f1f5f9;
@@ -114,6 +147,70 @@
   --accent-foreground: rgb(129, 74, 200);
   --border: #e2e8f0;
   --input: #e2e8f0;
+  --ring: rgb(129, 74, 200);
+
+  --sidebar: #ffffff;
+  --sidebar-foreground: #111827;
+}
+
+.theme-midnight {
+  --radius: 1rem;
+
+  /* Midnight Purple - Deep Purple Tint */
+  --background: #0a0812;
+  --foreground: #f5f3ff;
+  --card: rgba(23, 20, 35, 0.8);
+  --card-foreground: #f5f3ff;
+  --popover: #0a0812;
+  --popover-foreground: #f5f3ff;
+  --primary: #a855f7;
+  --primary-foreground: #ffffff;
+  --primary-gradient-start: #d8b4fe;
+  --primary-gradient-end: #a855f7;
+  --secondary: #1e1b4b;
+  --secondary-foreground: #ffffff;
+  --muted: rgba(168, 85, 247, 0.05);
+  --muted-foreground: #c4b5fd;
+  --accent: rgba(168, 85, 247, 0.15);
+  --accent-foreground: #d8b4fe;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #312e81;
+  --input: #312e81;
+  --ring: #a855f7;
+
+  --sidebar: #0a0812;
+  --sidebar-foreground: #f5f3ff;
+}
+
+.theme-slate {
+  --radius: 1rem;
+
+  /* Slate Blue - Blue-Grey Tones */
+  --background: #0f172a;
+  --foreground: #f8fafc;
+  --card: rgba(30, 41, 59, 0.8);
+  --card-foreground: #f8fafc;
+  --popover: #0f172a;
+  --popover-foreground: #f8fafc;
+  --primary: #6366f1;
+  --primary-foreground: #ffffff;
+  --primary-gradient-start: #818cf8;
+  --primary-gradient-end: #6366f1;
+  --secondary: #1e293b;
+  --secondary-foreground: #f8fafc;
+  --muted: rgba(99, 102, 241, 0.05);
+  --muted-foreground: #94a3b8;
+  --accent: rgba(99, 102, 241, 0.1);
+  --accent-foreground: #818cf8;
+  --destructive: #f43f5e;
+  --destructive-foreground: #ffffff;
+  --border: #334155;
+  --input: #334155;
+  --ring: #6366f1;
+
+  --sidebar: #0f172a;
+  --sidebar-foreground: #f8fafc;
 }
 
 @layer base {

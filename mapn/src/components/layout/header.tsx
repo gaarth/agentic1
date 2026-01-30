@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { Menu, X, Settings } from "lucide-react"
-import { ThemeSlider } from "@/components/ui/theme-slider"
+import { SettingsDropdown } from "@/components/layout/settings-dropdown"
 
 const navItems = [
     { label: "Services", href: "#services" },
@@ -17,6 +17,7 @@ export function Header() {
     const [isScrolled, setIsScrolled] = useState(false)
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
     const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+    const settingsTriggerRef = useRef<HTMLButtonElement>(null)
 
     useEffect(() => {
         const handleScroll = () => {
@@ -40,11 +41,19 @@ export function Header() {
                 <div className="max-w-[1200px] mx-auto px-10 py-4">
                     <div className="flex items-center justify-between">
                         {/* Logo */}
-                        <Link href="/" className="flex items-center gap-2">
-                            <div className="w-[30px] h-[30px] rounded-lg bg-gradient-primary flex items-center justify-center">
-                                <span className="text-white font-bold text-sm">X</span>
+                        <Link href="/" className="flex items-center gap-3 group">
+                            <div className="relative w-10 h-10 rounded-xl overflow-hidden bg-black flex items-center justify-center border border-white/10 shadow-lg group-hover:scale-105 transition-transform duration-300">
+                                <img
+                                    src="/logo.jpg"
+                                    alt="MACANE Logo"
+                                    className="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity"
+                                />
+                                {/* Glow effect behind logo */}
+                                <div className="absolute inset-0 bg-primary/20 blur-md -z-10" />
                             </div>
-                            <span className="text-xl font-semibold text-foreground">MACANE</span>
+                            <span className="text-xl font-bold tracking-tight text-foreground bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
+                                MACANE
+                            </span>
                         </Link>
 
                         {/* Desktop Navigation */}
@@ -53,9 +62,10 @@ export function Header() {
                                 <Link
                                     key={item.label}
                                     href={item.href}
-                                    className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                                    className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative group"
                                 >
                                     {item.label}
+                                    <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-primary transition-all group-hover:w-full" />
                                 </Link>
                             ))}
                         </nav>
@@ -64,41 +74,29 @@ export function Header() {
                         <div className="hidden md:flex items-center gap-4">
                             <Link
                                 href="/dashboard"
-                                className="px-5 py-2.5 text-sm font-medium text-primary-foreground bg-gradient-primary rounded-full hover:opacity-90 transition-opacity"
+                                className="px-5 py-2.5 text-sm font-medium text-white bg-gradient-primary rounded-full hover:shadow-lg hover:shadow-primary/25 transition-all duration-300 hover:-translate-y-0.5"
                             >
                                 Get Started
                             </Link>
 
                             <div className="relative">
                                 <button
+                                    ref={settingsTriggerRef}
                                     onClick={() => setIsSettingsOpen(!isSettingsOpen)}
-                                    className="p-2 text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-secondary/50"
+                                    className={cn(
+                                        "p-2.5 transition-all rounded-full hover:bg-secondary/50",
+                                        isSettingsOpen ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground"
+                                    )}
                                     aria-label="Settings"
                                 >
-                                    <Settings size={20} />
+                                    <Settings size={20} className={isSettingsOpen ? "animate-spin-slow" : ""} />
                                 </button>
 
-                                <AnimatePresence>
-                                    {isSettingsOpen && (
-                                        <motion.div
-                                            initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                                            exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                                            transition={{ duration: 0.2 }}
-                                            className="absolute right-0 top-full mt-2 w-56 rounded-xl bg-card border border-border p-4 shadow-xl z-50 glass-morphism"
-                                        >
-                                            <div className="flex items-center justify-between mb-2">
-                                                <span className="text-sm font-medium text-foreground">Settings</span>
-                                            </div>
-                                            <div className="flex items-center justify-between p-2 rounded-lg bg-secondary/30">
-                                                <span className="text-sm text-muted-foreground flex items-center gap-2">
-                                                    Mode
-                                                </span>
-                                                <ThemeSlider />
-                                            </div>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
+                                <SettingsDropdown
+                                    isOpen={isSettingsOpen}
+                                    onClose={() => setIsSettingsOpen(false)}
+                                    triggerRef={settingsTriggerRef}
+                                />
                             </div>
                         </div>
 
@@ -122,23 +120,24 @@ export function Header() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
                         transition={{ duration: 0.3 }}
-                        className="fixed inset-0 z-40 bg-background pt-20"
+                        className="fixed inset-0 z-40 bg-background/95 backdrop-blur-3xl pt-24 px-6"
                     >
-                        <nav className="flex flex-col items-center gap-6 p-8">
+                        <nav className="flex flex-col items-center gap-8">
                             {navItems.map((item) => (
                                 <Link
                                     key={item.label}
                                     href={item.href}
                                     onClick={() => setIsMobileMenuOpen(false)}
-                                    className="text-lg font-medium text-muted-foreground hover:text-foreground transition-colors"
+                                    className="text-2xl font-medium text-foreground/80 hover:text-foreground transition-colors"
                                 >
                                     {item.label}
                                 </Link>
                             ))}
+                            <div className="h-px w-20 bg-border my-2" />
                             <Link
                                 href="/dashboard"
                                 onClick={() => setIsMobileMenuOpen(false)}
-                                className="mt-4 px-8 py-3 text-base font-medium text-primary-foreground bg-gradient-primary rounded-full"
+                                className="px-8 py-4 text-lg font-bold text-white bg-gradient-primary rounded-full shadow-xl shadow-primary/20"
                             >
                                 Get Started
                             </Link>
@@ -149,3 +148,8 @@ export function Header() {
         </>
     )
 }
+
+function cn(...classes: (string | undefined | null | false)[]) {
+    return classes.filter(Boolean).join(" ");
+}
+

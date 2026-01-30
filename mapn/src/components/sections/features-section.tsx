@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion"
 import { ShieldCheck, TrendingUp, Scale, Droplets } from "lucide-react"
+import { GlowingEffect } from "@/components/ui/glowing-effect"
 
 // Features based on existing agent system
 const features = [
@@ -86,13 +87,23 @@ export function FeaturesSection() {
                         <motion.div
                             key={feature.title}
                             variants={itemVariants}
-                            className="group p-8 rounded-2xl glass-panel hover:border-primary/30 transition-all duration-300"
+                            className="group p-8 rounded-2xl glass-panel relative overflow-hidden transition-all duration-300"
                         >
-                            <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                                <feature.icon className="w-7 h-7 text-foreground" />
+                            <GlowingEffect
+                                spread={40}
+                                glow={true}
+                                disabled={false}
+                                proximity={64}
+                                inactiveZone={0.01}
+                                borderWidth={3}
+                            />
+                            <div className="relative z-10">
+                                <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                                    <feature.icon className="w-7 h-7 text-foreground" />
+                                </div>
+                                <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
+                                <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
                             </div>
-                            <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
-                            <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
                         </motion.div>
                     ))}
                 </motion.div>

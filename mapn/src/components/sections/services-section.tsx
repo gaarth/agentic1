@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion"
 import { Workflow, LineChart, Bell, FileSearch } from "lucide-react"
+import { GlowingEffect } from "@/components/ui/glowing-effect"
 
 const services = [
     {
@@ -69,14 +70,24 @@ export function ServicesSection() {
                             whileInView="visible"
                             viewport={{ once: true }}
                             transition={{ delay: index * 0.1 }}
-                            className="p-6 rounded-xl glass-panel flex items-start gap-6 hover:border-primary/30 transition-colors group"
+                            className="p-6 rounded-xl glass-panel relative overflow-hidden transition-colors group"
                         >
-                            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
-                                <service.icon className="w-6 h-6 text-primary" />
-                            </div>
-                            <div>
-                                <h3 className="text-lg font-semibold mb-2">{service.title}</h3>
-                                <p className="text-muted-foreground">{service.description}</p>
+                            <GlowingEffect
+                                spread={40}
+                                glow={true}
+                                disabled={false}
+                                proximity={64}
+                                inactiveZone={0.01}
+                                borderWidth={3}
+                            />
+                            <div className="relative z-10 flex items-start gap-6 hover:border-primary/30">
+                                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
+                                    <service.icon className="w-6 h-6 text-primary" />
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-semibold mb-2">{service.title}</h3>
+                                    <p className="text-muted-foreground">{service.description}</p>
+                                </div>
                             </div>
                         </motion.div>
                     ))}
